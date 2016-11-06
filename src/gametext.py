@@ -28,7 +28,6 @@ class PlayerInfoText(Text):
             self.display_on_screen(screen, msg, 1, (255, 255, 255), self.x_coord, self.y_coord + i * 15)
 
 
-
 class PauseText(Text):
 
     def update(self, screen):

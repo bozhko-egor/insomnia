@@ -1,12 +1,13 @@
 import pygame
 from pygame.locals import *
-from src.platforms import AlarmClock
+from src.platforms import AlarmClock, PowerUp
 
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, gamestate):
         super().__init__()
+        self.gamestate = gamestate
         self.xvel = 0
         self.yvel = 0
         self.onGround = False
@@ -15,6 +16,7 @@ class Player(pygame.sprite.Sprite):
         self.image.convert()
         self.rect = Rect(x, y, 32, 32)
         self.score = 0
+        self.pwup_score = 0
         self.lives = 3
         self.level = 1
 
@@ -44,13 +46,18 @@ class Player(pygame.sprite.Sprite):
         self.onGround = False
         # do y-axis collisions
         self.collide(0, self.yvel, platforms)
-        self.score = self.rect.bottom // 100
+        self.score = self.pwup_score + self.rect.bottom // 100
 
     def collide(self, xvel, yvel, platforms):
-        for p in platforms:
+        for p in platforms[:]:
             if pygame.sprite.collide_rect(self, p):
                 if isinstance(p, AlarmClock):
                     pass
+                if isinstance(p, PowerUp):
+                    self.gamestate.platforms.remove(p)
+                    self.gamestate.entities.remove(p)
+                    self.pwup_score += 50
+                    return
                 if xvel > 0:
                     self.rect.right = p.rect.left
                 if xvel < 0:

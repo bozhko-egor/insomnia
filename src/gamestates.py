@@ -3,7 +3,7 @@ import sys
 from pygame.locals import *
 from src.player import Player
 from src.levels import level1
-from src.platforms import Platform, AlarmClock
+from src.platforms import Platform, AlarmClock, PowerUp
 from src.gametext import PlayerInfoText, PauseText
 
 
@@ -36,6 +36,7 @@ class GameState:
         pygame.quit()
         sys.exit()
 
+
 class PlayGameState(GameState):
 
     def __init__(self, *args):
@@ -44,12 +45,12 @@ class PlayGameState(GameState):
         self.bg.convert()
         self.bg.fill(Color("#000000"))
         self.entities = pygame.sprite.Group()
-        self.player = Player(32, 32)
+        self.player = Player(32, 32, self)
         self.platforms = []
         self.level = level1
         self.build_level(self.level)
-        total_level_width = len(self.level[0])*32
-        total_level_height = len(self.level)*32
+        total_level_width = len(self.level[0]) * 32
+        total_level_height = len(self.level) * 32
         self.camera = OffsetCamera(self.complex_camera, total_level_width, total_level_height)
         self.entities.add(self.player)
         self.text = PlayerInfoText(self.player, 500, 50, "monospace", 17)
@@ -67,6 +68,10 @@ class PlayGameState(GameState):
                     clock = AlarmClock(x, y)
                     self.platforms.append(clock)
                     self.entities.add(clock)
+                if col == "U":
+                    pu = PowerUp(x, y)
+                    self.platforms.append(pu)
+                    self.entities.add(pu)
                 x += 32
             y += 32
             x = 0
@@ -123,7 +128,18 @@ class PlayGameState(GameState):
 
 
 class DeathScreenState(GameState):
-    pass
+
+    def __init__(self, *args):
+        super().__init__(*args)
+
+    def draw(self):
+        pass
+
+    def update(self):
+        pass
+
+    def input(self):
+        pass
 
 
 class PauseGameState(GameState):
@@ -146,4 +162,15 @@ class PauseGameState(GameState):
 
 
 class MenuGameState(GameState):
-    pass
+
+    def __init__(self, *args):
+        super().__init__(*args)
+
+    def draw(self):
+        pass
+
+    def update(self):
+        pass
+
+    def input(self):
+        pass
