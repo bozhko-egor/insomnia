@@ -4,7 +4,7 @@ from pygame.locals import *
 from src.player import Player
 from src.levels import level1
 from src.platforms import Platform, AlarmClock
-from src.gametext import PlayerInfoText
+from src.gametext import PlayerInfoText, PauseText
 
 
 class OffsetCamera:
@@ -22,7 +22,8 @@ class OffsetCamera:
 
 class GameState:
 
-    def __init__(self):
+    def __init__(self, engine):
+        self.engine = engine
         self.width = 640
         self.height = 800
         self.screen_res = (self.width, self.height)
@@ -37,8 +38,8 @@ class GameState:
 
 class PlayGameState(GameState):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args):
+        super().__init__(*args)
         self.bg = pygame.Surface((32, 32))
         self.bg.convert()
         self.bg.fill(Color("#000000"))
@@ -71,7 +72,6 @@ class PlayGameState(GameState):
             x = 0
 
     def draw(self):
-        self.timer.tick(60)
         for y in range(32):
             for x in range(32):
                 self.screen.blit(self.bg, (x * 32, y * 32))
@@ -79,6 +79,7 @@ class PlayGameState(GameState):
             self.screen.blit(e.image, self.camera.apply(e))
 
     def update(self):
+        self.timer.tick(60)
         self.camera.update(self.player)
         self.text.update(self.screen)
         self.player.update(self.up, self.down, self.left, self.right, self.platforms)
@@ -97,7 +98,8 @@ class PlayGameState(GameState):
                 self.left = True
             elif event.key == K_RIGHT:
                 self.right = True
-
+            elif event.key == K_ESCAPE:
+                self.engine.current_state = 1
         if event.type == KEYUP:
             if event.key == K_UP:
                 self.up = False
@@ -111,7 +113,7 @@ class PlayGameState(GameState):
     def complex_camera(self, camera, target_rect):
         l, t, _, _ = target_rect
         _, _, w, h = camera
-        l, t, _, _ = -l + self.width // 2, -t + self.height // 2, w, h
+        l, t = -l + self.width // 2, -t + self.height // 2
 
         l = min(0, l)                           # stop scrolling at the left edge
         l = max(-(camera.width - self.width), l)   # stop scrolling at the right edge
@@ -122,6 +124,25 @@ class PlayGameState(GameState):
 
 class DeathScreenState(GameState):
     pass
+
+
+class PauseGameState(GameState):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.text = PauseText(250, 200, "monospace", 45)
+
+    def draw(self):
+        pass
+
+    def update(self):
+        self.text.update(self.screen)
+        pygame.display.update()
+
+    def input(self, event):
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                self.engine.current_state = 0
 
 
 class MenuGameState(GameState):
