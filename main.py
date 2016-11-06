@@ -1,15 +1,11 @@
 import pygame
 from pygame import *
-from src.gamestate import PlayGameState
+from src.gamestates import PlayGameState
 
 
 class GameEngine:
 
     def __init__(self):
-        self.width = 640
-        self.height = 800
-        self.screen_res = (self.width, self.height)
-
         pygame.init()
         pygame.display.set_caption("v.0.01a")
         self.states = [PlayGameState()]

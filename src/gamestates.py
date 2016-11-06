@@ -20,14 +20,25 @@ class OffsetCamera:
         self.state = self.camera_func(self.state, target.rect)
 
 
-class PlayGameState:
+class GameState:
 
     def __init__(self):
-        self.screen_res = (640, 800)
+        self.width = 640
+        self.height = 800
+        self.screen_res = (self.width, self.height)
         self.depth = 32
         self.flags = 0
         self.screen = pygame.display.set_mode(self.screen_res, self.flags, self.depth)
         self.timer = pygame.time.Clock()
+
+    def exit(self):
+        pygame.quit()
+        sys.exit()
+
+class PlayGameState(GameState):
+
+    def __init__(self):
+        super().__init__()
         self.bg = pygame.Surface((32, 32))
         self.bg.convert()
         self.bg.fill(Color("#000000"))
@@ -75,8 +86,7 @@ class PlayGameState:
 
     def input(self, event):
         if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
+            self.exit()
 
         if event.type == KEYDOWN:
             if event.key == K_UP:
@@ -101,10 +111,18 @@ class PlayGameState:
     def complex_camera(self, camera, target_rect):
         l, t, _, _ = target_rect
         _, _, w, h = camera
-        l, t, _, _ = -l + self.screen_res[0] // 2, -t + self.screen_res[1] // 2, w, h
+        l, t, _, _ = -l + self.width // 2, -t + self.height // 2, w, h
 
         l = min(0, l)                           # stop scrolling at the left edge
-        l = max(-(camera.width - self.screen_res[0]), l)   # stop scrolling at the right edge
-        t = max(-(camera.height - self.screen_res[1]), t) # stop scrolling at the bottom
+        l = max(-(camera.width - self.width), l)   # stop scrolling at the right edge
+        t = max(-(camera.height - self.height), t) # stop scrolling at the bottom
         t = min(0, t)                           # stop scrolling at the top
         return Rect(l, t, w, h)
+
+
+class DeathScreenState(GameState):
+    pass
+
+
+class MenuGameState(GameState):
+    pass
