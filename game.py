@@ -8,7 +8,7 @@ class Game:
     pygame.display.set_caption('testing stuff')
 
     def __init__(self):
-        self.screen_res = [800, 600]
+        self.screen_res = [600, 800]
         self.screen = pygame.display.set_mode(self.screen_res)
         self.player = PlayerSprite(50, 50)
         self.player.game = self
@@ -21,10 +21,13 @@ class Game:
         self.all_sprites_list.add(wall)
         self.player.walls = wall_list
         self.clock.tick(45)
+        #self.background = Background('sample_background.png', [0, 0])
         while True:
+            #self.background.start_falling()
+            self.screen.fill((255, 255, 255))
+            #self.screen.blit(self.background.image, self.background.rect)
             self.main_loop()
             self.all_sprites_list.update()
-            self.screen.fill((255, 255, 255))
             self.all_sprites_list.draw(self.screen)
             pygame.display.update()
 
@@ -115,6 +118,19 @@ class Platform(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.y = y
             self.rect.x = x
+
+
+class Background(pygame.sprite.Sprite):
+
+    def __init__(self, image_file, location):
+        super().__init__()
+        self.image = pygame.image.load(image_file)
+        self.rect = self.image.get_rect()
+        self.rect.left, self.rect.top = location
+        self.speed = 5
+
+    def start_falling(self):
+        self.rect.top -= self.speed
 
 
 if __name__ == '__main__':
