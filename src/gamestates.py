@@ -156,21 +156,87 @@ class PauseGameState(GameState):
         pygame.display.update()
 
     def input(self, event):
+        if event.type == QUIT:
+            self.exit()
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 self.engine.current_state = 0
+
+
+class MenuItem(pygame.font.Font):
+
+    def __init__(self, text, font=None, font_size=55,
+                 font_color=(255, 255, 255)):
+        super().__init__(font, font_size)
+        self.text = text
+        self.font_size = font_size
+        self.font_color = font_color
+        self.label = self.render(self.text, 1, self.font_color)
+        self.width = self.label.get_rect().width
+        self.height = self.label.get_rect().height
+        self.pos_x = 0
+        self.pos_y = 0
+        self.position = self.pos_x, self.pos_y
+
+    def set_position(self, x, y):
+        self.position = (x, y)
+        self.pos_x = x
+        self.pos_y = y
+
+    def set_font_color(self, rgb):
+        self.font_color = rgb
+        self.label = self.render(self.text, 1, self.font_color)
 
 
 class MenuGameState(GameState):
 
     def __init__(self, *args):
         super().__init__(*args)
+        self.bg_color = (0, 0, 0)
+        self.menu_items = ('New game', 'Highscores', 'Options', "Credits", 'Quit')
+        self.font_color = (255, 255, 255)
+        self.items = []
+        self.width = self.screen.get_rect().width
+        self.height = self.screen.get_rect().height
+        self.cur_item = None
+        for index, item in enumerate(self.menu_items):
+            menu_item = MenuItem(item)
+            t_h = len(self.menu_items) * menu_item.height
+            pos_x = (self.width / 2) - (menu_item.width / 2)
+            pos_y = (self.height / 2) - (t_h / 2) + ((index * 2) + index * menu_item.height)
+            menu_item.set_position(pos_x, pos_y)
+            self.items.append(menu_item)
 
     def draw(self):
-        pass
+        self.timer.tick(60)
+        self.screen.fill(self.bg_color)
+        for item in self.items:
+            self.screen.blit(item.label, item.position)
+        pygame.display.update()
 
     def update(self):
         pass
 
-    def input(self):
-        pass
+    def input(self, event):
+        if event.type == QUIT:
+            self.exit()
+        if event.type == pygame.KEYDOWN:
+            self.set_keyboard_selection(event.key)
+
+    def set_keyboard_selection(self, key):
+        for item in self.items:
+            item.set_font_color((255, 255, 255))
+
+        if self.cur_item is None:
+            self.cur_item = 0
+        else:
+            if key == pygame.K_UP and self.cur_item > 0:
+                self.cur_item -= 1
+            elif key == pygame.K_UP and self.cur_item == 0:
+                self.cur_item = len(self.items) - 1
+            elif key == pygame.K_DOWN and self.cur_item < len(self.items) - 1:
+                self.cur_item += 1
+            elif key == pygame.K_DOWN and self.cur_item == len(self.items) - 1:
+                self.cur_item = 0
+
+        self.items[self.cur_item].set_font_color((255, 0, 0))
