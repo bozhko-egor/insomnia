@@ -60,18 +60,14 @@ class PlayGameState(GameState):
         x = y = 0
         for row in level:
             for col in row:
-                if col == "P":
-                    p = Platform(x, y)
+                platform_switch = {"P": Platform,
+                                   "A": AlarmClock,
+                                   "U": PowerUp}
+                plat_class = platform_switch.get(col, None)
+                if plat_class:
+                    p = plat_class(x, y)
                     self.platforms.append(p)
                     self.entities.add(p)
-                if col == "A":
-                    clock = AlarmClock(x, y)
-                    self.platforms.append(clock)
-                    self.entities.add(clock)
-                if col == "U":
-                    pu = PowerUp(x, y)
-                    self.platforms.append(pu)
-                    self.entities.add(pu)
                 x += 32
             y += 32
             x = 0
@@ -103,8 +99,10 @@ class PlayGameState(GameState):
                 self.left = True
             elif event.key == K_RIGHT:
                 self.right = True
-            elif event.key == K_ESCAPE or K_p:
+            elif event.key in [K_ESCAPE, K_p]:
                 self.engine.to_pause()
+            elif event.key == K_r:
+                self.engine.new_game()
         if event.type == KEYUP:
             if event.key == K_UP:
                 self.up = False
@@ -186,6 +184,8 @@ class MenuGameState(GameState):
             self.exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
+                if self.cur_item is None:
+                    return
                 chosen_func = self.menu_func.get(self.menu_items[self.cur_item])
                 chosen_func()
             else:
@@ -233,7 +233,7 @@ class TempScreen(MenuGameState):
 
     def draw(self):
         super().draw()
-        label = self.font.render('Nothing there yet!', 1, (0, 255, 0))
+        label = self.font.render('Nothing here yet!', 1, (0, 255, 0))
         self.screen.blit(label, (100, 150))
 
 
