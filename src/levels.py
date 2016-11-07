@@ -25,12 +25,16 @@ def level_generate(width, height):
 
 
     set_of_elements = ['A', 'P', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
-    level = []
+    level = ['PPPPPPPPPPPPPPPPPPPP',
+             'P                  P',
+             'P                  P',
+             'P                  P',
+             'P                  P']
     skip = 3
 
     for k in range(height // (5 + skip)):
 
-        level.append(choice(level_patterns))
+        level += choice(level_patterns)
 
         for i in range(skip):
             string_val = 'P' + ''.join(choice(set_of_elements) for i in range(width - 2)) + 'P'
@@ -38,9 +42,4 @@ def level_generate(width, height):
 
     return level
 
-def level_test():
-    level = level_generate(20,1000)
-    for element in level:
-        print(element[0])
-
-level_test()
+level1 = level_generate(20,1000)
