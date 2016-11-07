@@ -52,7 +52,8 @@ class Player(pygame.sprite.Sprite):
         for p in platforms[:]:
             if pygame.sprite.collide_rect(self, p):
                 if isinstance(p, AlarmClock):
-                    pass
+                    self.gamestate.engine.to_death_screen()
+                    return
                 if isinstance(p, PowerUp):
                     self.gamestate.platforms.remove(p)
                     self.gamestate.entities.remove(p)

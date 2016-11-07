@@ -4,7 +4,7 @@ from pygame.locals import *
 from src.player import Player
 from src.levels import level1
 from src.platforms import Platform, AlarmClock, PowerUp
-from src.gametext import PlayerInfoText, PauseText
+from src.gametext import PlayerInfoText
 
 
 class OffsetCamera:
@@ -103,8 +103,8 @@ class PlayGameState(GameState):
                 self.left = True
             elif event.key == K_RIGHT:
                 self.right = True
-            elif event.key == K_ESCAPE:
-                self.engine.current_state = 1
+            elif event.key == K_ESCAPE or K_p:
+                self.engine.to_pause()
         if event.type == KEYUP:
             if event.key == K_UP:
                 self.up = False
@@ -126,41 +126,6 @@ class PlayGameState(GameState):
         t = min(0, t)                           # stop scrolling at the top
         return Rect(l, t, w, h)
 
-
-class DeathScreenState(GameState):
-
-    def __init__(self, *args):
-        super().__init__(*args)
-
-    def draw(self):
-        pass
-
-    def update(self):
-        pass
-
-    def input(self):
-        pass
-
-
-class PauseGameState(GameState):
-
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.text = PauseText(250, 200, "monospace", 45)
-
-    def draw(self):
-        pass
-
-    def update(self):
-        self.text.update(self.screen)
-        pygame.display.update()
-
-    def input(self, event):
-        if event.type == QUIT:
-            self.exit()
-        if event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
-                self.engine.current_state = 0
 
 
 class MenuItem(pygame.font.Font):
@@ -193,35 +158,38 @@ class MenuGameState(GameState):
     def __init__(self, *args):
         super().__init__(*args)
         self.bg_color = (0, 0, 0)
-        self.menu_items = ('New game', 'Highscores', 'Options', "Credits", 'Quit')
+        self.menu_items = ('New game', 'Highscores', 'Options', "About", 'Quit')
+        self.menu_func = {'New game': self.engine.new_game,
+                          'Highscores': self.engine.to_temp,
+                          'Options': self.engine.to_temp,
+                          'About': self.engine.to_temp,
+                          'Quit': self.exit}
         self.font_color = (255, 255, 255)
         self.items = []
         self.width = self.screen.get_rect().width
         self.height = self.screen.get_rect().height
         self.cur_item = None
-        for index, item in enumerate(self.menu_items):
-            menu_item = MenuItem(item)
-            t_h = len(self.menu_items) * menu_item.height
-            pos_x = (self.width / 2) - (menu_item.width / 2)
-            pos_y = (self.height / 2) - (t_h / 2) + ((index * 2) + index * menu_item.height)
-            menu_item.set_position(pos_x, pos_y)
-            self.items.append(menu_item)
+        if not isinstance(self, TempScreen) and not isinstance(self, DeathScreenState) and not isinstance(self, PauseGameState):  # this is horrible hack
+            self.setup_menu()
 
     def draw(self):
         self.timer.tick(60)
         self.screen.fill(self.bg_color)
         for item in self.items:
             self.screen.blit(item.label, item.position)
-        pygame.display.update()
 
     def update(self):
-        pass
+        pygame.display.update()
 
     def input(self, event):
         if event.type == QUIT:
             self.exit()
         if event.type == pygame.KEYDOWN:
-            self.set_keyboard_selection(event.key)
+            if event.key == pygame.K_RETURN:
+                chosen_func = self.menu_func.get(self.menu_items[self.cur_item])
+                chosen_func()
+            else:
+                self.set_keyboard_selection(event.key)
 
     def set_keyboard_selection(self, key):
         for item in self.items:
@@ -240,3 +208,70 @@ class MenuGameState(GameState):
                 self.cur_item = 0
 
         self.items[self.cur_item].set_font_color((255, 0, 0))
+
+    def setup_menu(self):
+        for index, item in enumerate(self.menu_items):
+            menu_item = MenuItem(item)
+            t_h = len(self.menu_items) * menu_item.height
+            pos_x = (self.width / 2) - (menu_item.width / 2)
+            pos_y = (self.height / 2) - (t_h / 2) + ((index * 2) + index * menu_item.height)
+            menu_item.set_position(pos_x, pos_y)
+            self.items.append(menu_item)
+
+    def display_temporary_screen(self):
+        pass
+
+
+class TempScreen(MenuGameState):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.menu_items = ('Back',)
+        self.menu_func = {'Back': self.engine.to_menu}
+        self.font = pygame.font.SysFont("monospace", 45)
+        self.setup_menu()
+
+    def draw(self):
+        super().draw()
+        label = self.font.render('Nothing there yet!', 1, (0, 255, 0))
+        self.screen.blit(label, (100, 150))
+
+
+class DeathScreenState(MenuGameState):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.menu_items = ('Retry?', 'No, thanks')
+        self.menu_func = {'Retry?': self.engine.new_game,
+                          'No, thanks': self.engine.to_menu}
+        self.font = pygame.font.SysFont("monospace", 50)
+        self.setup_menu()
+
+    def draw(self):
+        super().draw()
+        label = self.font.render('YOU DIED', 1, (255, 0, 0))
+        self.screen.blit(label, (200, 150))
+
+
+class PauseGameState(MenuGameState):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.menu_items = ('Continue', 'Restart level', 'To menu', 'Exit')
+        self.menu_func = {'Continue': self.engine.to_game,
+                          'Restart level': self.engine.new_game,
+                          'To menu': self.engine.to_menu,
+                          'Exit': self.exit}
+        self.font = pygame.font.SysFont("monospace", 50)
+        self.setup_menu()
+
+    def input(self, event):
+        super().input(event)
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                self.engine.to_game()
+
+    def draw(self):
+        super().draw()
+        label = self.font.render('Paused', 1, (255, 0, 0))
+        self.screen.blit(label, (235, 150))

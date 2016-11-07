@@ -26,10 +26,3 @@ class PlayerInfoText(Text):
         lives_msg = "Lives: {}".format(self.player.lives)
         for i, msg in enumerate([level_msg, score_msg, lives_msg]):
             self.display_on_screen(screen, msg, 1, (255, 255, 255), self.x_coord, self.y_coord + i * 15)
-
-
-class PauseText(Text):
-
-    def update(self, screen):
-        msg = "PAUSED"
-        self.display_on_screen(screen, msg, 1, (255, 255, 255), self.x_coord, self.y_coord)
