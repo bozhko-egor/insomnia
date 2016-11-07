@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
-from src.platforms import AlarmClock, PowerUp
+from src.platforms import AlarmClock, PowerUp, SlowDown, DefaultEffect
+import time
 
 
 class Player(pygame.sprite.Sprite):
@@ -19,8 +20,12 @@ class Player(pygame.sprite.Sprite):
         self.pwup_score = 0
         self.lives = 3
         self.level = 1
+        self.timer = 0
+        self.status_effects = []
+        self.max_vel = 100
 
     def update(self, up, down, left, right, platforms):
+        self.check_status_effects()
         if up:
             if self.onGround:
                 self.yvel -= 10
@@ -32,8 +37,8 @@ class Player(pygame.sprite.Sprite):
             self.xvel = 8
         if not self.onGround:
             self.yvel += 0.3
-            if self.yvel > 100:
-                self.yvel = 100
+            if self.yvel > self.max_vel:
+                self.yvel = self.max_vel
         if not(left or right):
             self.xvel = 0
         # increment in x direction
@@ -48,6 +53,9 @@ class Player(pygame.sprite.Sprite):
         self.collide(0, self.yvel, platforms)
         self.score = self.pwup_score + self.rect.bottom // 100
 
+    def count_time_passed():
+        pass
+
     def collide(self, xvel, yvel, platforms):
         for p in platforms[:]:
             if pygame.sprite.collide_rect(self, p):
@@ -58,6 +66,13 @@ class Player(pygame.sprite.Sprite):
                     self.gamestate.platforms.remove(p)
                     self.gamestate.entities.remove(p)
                     self.pwup_score += 50
+                    return
+                if isinstance(p, SlowDown):
+                    self.gamestate.platforms.remove(p)
+                    self.gamestate.entities.remove(p)
+                    effect = p.effect(self)
+                    effect.start_time = self.timer
+                    self.status_effects.append(effect)
                     return
                 if xvel > 0:
                     self.rect.right = p.rect.left
@@ -70,3 +85,10 @@ class Player(pygame.sprite.Sprite):
                 if yvel < 0:
                     self.yvel = 0  # lose speed on *head* contact with platform
                     self.rect.top = p.rect.bottom
+
+    def check_status_effects(self):
+        for effect in self.status_effects:
+            if effect.duration > self.timer - effect.start_time:
+                effect.set_effect()
+            else:
+                DefaultEffect(self).default_effects()

@@ -3,7 +3,7 @@ import sys
 from pygame.locals import *
 from src.player import Player
 from src.levels import level1
-from src.platforms import Platform, AlarmClock, PowerUp
+from src.platforms import Platform, AlarmClock, PowerUp, SlowDown
 from src.gametext import PlayerInfoText
 
 
@@ -55,6 +55,7 @@ class PlayGameState(GameState):
         self.entities.add(self.player)
         self.text = PlayerInfoText(self.player, 500, 50, "monospace", 17)
         self.up = self.down = self.left = self.right = False
+        pygame.time.set_timer(pygame.USEREVENT + 1, 250)
 
     def build_level(self, level):
         x = y = 0
@@ -62,7 +63,8 @@ class PlayGameState(GameState):
             for col in row:
                 platform_switch = {"P": Platform,
                                    "A": AlarmClock,
-                                   "U": PowerUp}
+                                   "U": PowerUp,
+                                   "S": SlowDown}
                 plat_class = platform_switch.get(col, None)
                 if plat_class:
                     p = plat_class(x, y)
@@ -87,6 +89,8 @@ class PlayGameState(GameState):
         pygame.display.update()
 
     def input(self, event):
+        if event.type == pygame.USEREVENT + 1:
+            self.player.timer += 0.25
         if event.type == QUIT:
             self.exit()
 
