@@ -9,10 +9,10 @@ class Effect:
         self.font = pygame.font.SysFont('monospace', 17)
         self.name = None
 
-    def update(self, screen, x, y):
-        msg = "{} for {}s more".format(self.name, self.time_left)
+    def update(self, x, y):
+        msg = "{} {}s".format(self.name, self.time_left)
         label = self.font.render(msg, 1, (255, 0, 255))
-        screen.blit(label, (x, y))
+        self.player.gamestate.screen.blit(label, (x, y))
 
 
 class DefaultEffect(Effect):
@@ -39,8 +39,31 @@ class InertiaEffect(Effect):
     def __init__(self, player):
         super().__init__(player)
         self.name = 'inertia'
-        self.duration = float("inf")
 
-    def set_effect(self):
+    def set_effect(self, up, down, left, right):
         """x acceleration"""
-        pass
+        if up:
+            if self.player.onGround:
+                self.player.yvel -= 10
+        if down:
+            pass
+        if left:
+            self.player.xvel += -0.3
+        if right:
+            self.player.xvel += 0.3
+        if not self.player.onGround:
+            self.player.yvel += 0.3
+            if self.player.yvel > self.player.max_vel:
+                self.player.yvel = self.player.max_vel
+        '''if not(left or right):
+            self.xvel = 0'''
+        if self.player.xvel < 0:
+            self.player.xvel += 0.1
+        if self.player.xvel > 0:
+            self.player.xvel -= 0.1
+        if abs(self.player.xvel) < 0.1:
+            self.player.xvel = 0
+
+    def update(self, x, y):
+        label = self.font.render(self.name, 1, (255, 0, 255))
+        self.player.gamestate.screen.blit(label, (x, y))

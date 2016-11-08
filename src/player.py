@@ -27,23 +27,22 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, up, down, left, right, platforms):
         self.check_status_effects()
-        if self.check_level_effects():  # using alternate mechanics
-            return
-        if up:
-            if self.onGround:
-                self.yvel -= 10
-        if down:
-            pass
-        if left:
-            self.xvel = -8
-        if right:
-            self.xvel = 8
-        if not self.onGround:
-            self.yvel += 0.3
-            if self.yvel > self.max_vel:
-                self.yvel = self.max_vel
-        if not(left or right):
-            self.xvel = 0
+        if not self.check_level_effects(up, down, left, right):  # using alternate mechanics
+            if up:
+                if self.onGround:
+                    self.yvel -= 10
+            if down:
+                pass
+            if left:
+                self.xvel = -8
+            if right:
+                self.xvel = 8
+            if not self.onGround:
+                self.yvel += 0.3
+                if self.yvel > self.max_vel:
+                    self.yvel = self.max_vel
+            if not(left or right):
+                self.xvel = 0
         # increment in x direction
         self.rect.left += self.xvel
         # do x-axis collisions
@@ -105,13 +104,13 @@ class Player(pygame.sprite.Sprite):
             effect.time_left = time_left
             if time_left > 0:
                 effect.set_effect()
-                effect.update(self.gamestate.screen, 35, 35 + i * 15)
+                effect.update(35, 35 + i * 15)
             else:
                 self.status_effects.remove(effect)
                 DefaultEffect(self).default_effects()
 
-    def check_level_effects(self):
+    def check_level_effects(self, *args):
         for i, effect in enumerate(self.gamestate.level_effects):
-            effect.set_effect()
-            effect.update(self.gamestate.screen, 35, 600 + i * 15)
+            effect.set_effect(*args)
+            effect.update(35, 700 + i * 15)
         return bool(len(self.gamestate.level_effects))

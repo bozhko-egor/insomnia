@@ -47,7 +47,7 @@ class PlayGameState(GameState):
         self.entities = pygame.sprite.Group()
         self.player = Player(32, 32, self)
         self.platforms = []
-        self.level_effects = levels[level_number][1]
+        self.level_effects = [x(self.player) for x in levels[level_number][1]]
         self.level_number = level_number
         self.level = levels[level_number][0]
         self.build_level(self.level)
