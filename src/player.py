@@ -52,9 +52,6 @@ class Player(pygame.sprite.Sprite):
         self.collide(0, self.yvel, platforms)
         self.score = self.pwup_score + self.rect.bottom // 100
 
-    def count_time_passed():
-        pass
-
     def collide(self, xvel, yvel, platforms):
         for p in platforms[:]:
             if pygame.sprite.collide_rect(self, p):
@@ -70,8 +67,9 @@ class Player(pygame.sprite.Sprite):
                     self.gamestate.platforms.remove(p)
                     self.gamestate.entities.remove(p)
                     effect = p.effect(self)
-                    effect.start_time = self.timer
-                    self.status_effects.append(effect)
+                    if not self.check_effect(effect):
+                        effect.start_time = self.timer
+                        self.status_effects.append(effect)
                     return
                 if isinstance(p, ExitBlock):
                     self.gamestate.engine.to_win_menu()
@@ -87,10 +85,20 @@ class Player(pygame.sprite.Sprite):
                     self.yvel = 0  # lose speed on *head* contact with platform
                     self.rect.top = p.rect.bottom
 
+    def check_effect(self, effect):
+        for element in self.status_effects[:]:
+            if type(effect) == type(element):
+                element.duration += effect.duration
+                return True
+        return False
+
     def check_status_effects(self):
-        for effect in self.status_effects[:]:
-            if effect.duration > self.timer - effect.start_time:
+        for i, effect in enumerate(self.status_effects[:]):
+            time_left = effect.duration - (self.timer - effect.start_time)
+            effect.time_left = time_left
+            if time_left > 0:
                 effect.set_effect()
+                effect.update(self.gamestate.screen, 35, 35 + i * 15)
             else:
                 self.status_effects.remove(effect)
                 DefaultEffect(self).default_effects()

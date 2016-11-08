@@ -8,9 +8,14 @@ class GameEngine:
 
     def __init__(self):
         pygame.init()
-        pygame.display.set_caption("v.0.01a")
+        pygame.display.set_caption("v.0.02a")
         self.state = MenuGameState(self)
-        self.states = [MenuGameState(self), PlayGameState(self), PauseGameState(self), TempScreen(self), DeathScreenState(self), RoundWinScreen(self)]
+        self.states = [MenuGameState(self),
+                       PlayGameState(self),
+                       PauseGameState(self),
+                       TempScreen(self),
+                       DeathScreenState(self),
+                       RoundWinScreen(self)]
         self.current_state = 0
 
     def main_loop(self):
