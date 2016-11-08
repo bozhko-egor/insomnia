@@ -2,8 +2,8 @@ import pygame
 import sys
 from pygame.locals import *
 from src.player import Player
-from src.levels import level1
-from src.platforms import Platform, AlarmClock, PowerUp, SlowDown
+from src.levels import levels
+from src.platforms import Platform, AlarmClock, PowerUp, SlowDown, ExitBlock
 from src.gametext import PlayerInfoText
 
 
@@ -39,15 +39,16 @@ class GameState:
 
 class PlayGameState(GameState):
 
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, engine, level_number=0):
+        super().__init__(engine)
         self.bg = pygame.Surface((32, 32))
         self.bg.convert()
         self.bg.fill(Color("#000000"))
         self.entities = pygame.sprite.Group()
         self.player = Player(32, 32, self)
         self.platforms = []
-        self.level = level1
+        self.level_number = level_number
+        self.level = levels[level_number]
         self.build_level(self.level)
         total_level_width = len(self.level[0]) * 32
         total_level_height = len(self.level) * 32
@@ -64,7 +65,8 @@ class PlayGameState(GameState):
                 platform_switch = {"P": Platform,
                                    "A": AlarmClock,
                                    "U": PowerUp,
-                                   "S": SlowDown}
+                                   "S": SlowDown,
+                                   "E": ExitBlock}
                 plat_class = platform_switch.get(col, None)
                 if plat_class:
                     p = plat_class(x, y)
@@ -171,7 +173,7 @@ class MenuGameState(GameState):
         self.width = self.screen.get_rect().width
         self.height = self.screen.get_rect().height
         self.cur_item = None
-        if not isinstance(self, TempScreen) and not isinstance(self, DeathScreenState) and not isinstance(self, PauseGameState):  # this is horrible hack
+        if type(self) == MenuGameState:
             self.setup_menu()
 
     def draw(self):
@@ -263,7 +265,7 @@ class PauseGameState(MenuGameState):
         super().__init__(*args)
         self.menu_items = ('Continue', 'Restart level', 'To menu', 'Exit')
         self.menu_func = {'Continue': self.engine.to_game,
-                          'Restart level': self.engine.new_game,
+                          'Restart level': self.engine.replay_lvl,
                           'To menu': self.engine.to_menu,
                           'Exit': self.exit}
         self.font = pygame.font.SysFont("monospace", 50)
@@ -279,3 +281,14 @@ class PauseGameState(MenuGameState):
         super().draw()
         label = self.font.render('Paused', 1, (255, 0, 0))
         self.screen.blit(label, (235, 150))
+
+class RoundWinScreen(MenuGameState):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.menu_items = ('Next level', 'Replay level', 'Menu')
+        self.menu_func = {'Next level': self.engine.to_next_lvl,
+                          'Replay level': self.engine.replay_lvl,
+                          'Menu': self.engine.to_menu}
+        self.font = pygame.font.SysFont("monospace", 50)
+        self.setup_menu()

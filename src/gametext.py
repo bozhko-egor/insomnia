@@ -21,7 +21,7 @@ class PlayerInfoText(Text):
         self.player = player
 
     def update(self, screen):
-        level_msg = "Level: {}".format(self.player.level)
+        level_msg = "Speed: {}".format(int(self.player.yvel))
         score_msg = "Score: {}".format(self.player.score)
         lives_msg = "Time: {}".format(int(self.player.timer))
         for i, msg in enumerate([level_msg, score_msg, lives_msg]):

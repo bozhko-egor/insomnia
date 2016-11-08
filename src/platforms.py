@@ -8,7 +8,7 @@ class DefaultEffect:
         self.player = player
 
     def default_effects(self):
-        self.player.max_vel = 100
+        self.player.max_vel = 30
 
 
 class SlowEffect:
@@ -19,8 +19,7 @@ class SlowEffect:
         self.start_time = None
 
     def set_effect(self):
-        self.player.max_vel = 10
-
+        self.player.max_vel = 5
 
 
 class Platform(pygame.sprite.Sprite):
@@ -45,6 +44,13 @@ class PowerUp(Platform):
     def __init__(self, x, y):
         super().__init__(x, y)
         self.image.fill(Color("#0000FF"))
+
+
+class ExitBlock(Platform):
+
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        self.image.fill(Color("#DDDDFF"))
 
 
 class SlowDown(Platform):

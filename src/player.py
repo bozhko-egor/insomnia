@@ -1,7 +1,6 @@
 import pygame
 from pygame.locals import *
-from src.platforms import AlarmClock, PowerUp, SlowDown, DefaultEffect
-import time
+from src.platforms import AlarmClock, PowerUp, SlowDown, DefaultEffect, ExitBlock
 
 
 class Player(pygame.sprite.Sprite):
@@ -22,7 +21,7 @@ class Player(pygame.sprite.Sprite):
         self.level = 1
         self.timer = 0
         self.status_effects = []
-        self.max_vel = 100
+        self.max_vel = 25
 
     def update(self, up, down, left, right, platforms):
         self.check_status_effects()
@@ -74,6 +73,8 @@ class Player(pygame.sprite.Sprite):
                     effect.start_time = self.timer
                     self.status_effects.append(effect)
                     return
+                if isinstance(p, ExitBlock):
+                    self.gamestate.engine.to_win_menu()
                 if xvel > 0:
                     self.rect.right = p.rect.left
                 if xvel < 0:
@@ -87,8 +88,9 @@ class Player(pygame.sprite.Sprite):
                     self.rect.top = p.rect.bottom
 
     def check_status_effects(self):
-        for effect in self.status_effects:
+        for effect in self.status_effects[:]:
             if effect.duration > self.timer - effect.start_time:
                 effect.set_effect()
             else:
+                self.status_effects.remove(effect)
                 DefaultEffect(self).default_effects()
