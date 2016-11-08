@@ -1,7 +1,7 @@
 import pygame
 from pygame import *
 from src.gamestates import PlayGameState, PauseGameState, MenuGameState, TempScreen, DeathScreenState, RoundWinScreen
-from src.levels import levels
+from src.level_config import levels
 
 
 class GameEngine:
@@ -52,7 +52,7 @@ class GameEngine:
     def to_next_lvl(self):
         lvl = self.states[1].level_number
         lvl += 1
-        if lvl > len(levels) - 1:
+        if lvl > len(levels[lvl][0]) - 1:
             lvl = 0
         self.states[1] = PlayGameState(self, lvl)
         self.current_state = 1

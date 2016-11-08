@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
-from src.platforms import AlarmClock, PowerUp, SlowDown, DefaultEffect, ExitBlock
+from src.platforms import AlarmClock, PowerUp, SlowDown, ExitBlock
+from .effects import DefaultEffect
 
 
 class Player(pygame.sprite.Sprite):
@@ -22,9 +23,12 @@ class Player(pygame.sprite.Sprite):
         self.timer = 0
         self.status_effects = []
         self.max_vel = 25
+        self.max_depth = 0
 
     def update(self, up, down, left, right, platforms):
         self.check_status_effects()
+        if self.check_level_effects():  # using alternate mechanics
+            return
         if up:
             if self.onGround:
                 self.yvel -= 10
@@ -50,7 +54,10 @@ class Player(pygame.sprite.Sprite):
         self.onGround = False
         # do y-axis collisions
         self.collide(0, self.yvel, platforms)
-        self.score = self.pwup_score + self.rect.bottom // 100
+
+        if self.max_depth < self.rect.bottom:
+            self.max_depth = self.rect.bottom
+        self.score = self.pwup_score + self.max_depth // 100
 
     def collide(self, xvel, yvel, platforms):
         for p in platforms[:]:
@@ -102,3 +109,9 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.status_effects.remove(effect)
                 DefaultEffect(self).default_effects()
+
+    def check_level_effects(self):
+        for i, effect in enumerate(self.gamestate.level_effects):
+            effect.set_effect()
+            effect.update(self.gamestate.screen, 35, 600 + i * 15)
+        return bool(len(self.gamestate.level_effects))

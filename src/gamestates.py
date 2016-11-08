@@ -2,7 +2,7 @@ import pygame
 import sys
 from pygame.locals import *
 from src.player import Player
-from src.levels import levels
+from src.level_config import levels
 from src.platforms import Platform, AlarmClock, PowerUp, SlowDown, ExitBlock
 from src.gametext import PlayerInfoText
 
@@ -47,8 +47,9 @@ class PlayGameState(GameState):
         self.entities = pygame.sprite.Group()
         self.player = Player(32, 32, self)
         self.platforms = []
+        self.level_effects = levels[level_number][1]
         self.level_number = level_number
-        self.level = levels[level_number]
+        self.level = levels[level_number][0]
         self.build_level(self.level)
         total_level_width = len(self.level[0]) * 32
         total_level_height = len(self.level) * 32
@@ -108,7 +109,7 @@ class PlayGameState(GameState):
             elif event.key in [K_ESCAPE, K_p]:
                 self.engine.to_pause()
             elif event.key == K_r:
-                self.engine.new_game()
+                self.engine.replay_lvl()
         if event.type == KEYUP:
             if event.key == K_UP:
                 self.up = False
@@ -129,7 +130,6 @@ class PlayGameState(GameState):
         t = max(-(camera.height - self.height), t) # stop scrolling at the bottom
         t = min(0, t)                           # stop scrolling at the top
         return Rect(l, t, w, h)
-
 
 
 class MenuItem(pygame.font.Font):
@@ -281,6 +281,7 @@ class PauseGameState(MenuGameState):
         super().draw()
         label = self.font.render('Paused', 1, (255, 0, 0))
         self.screen.blit(label, (235, 150))
+
 
 class RoundWinScreen(MenuGameState):
 
