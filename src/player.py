@@ -81,8 +81,10 @@ class Player(pygame.sprite.Sprite):
                     self.gamestate.engine.to_win_menu()
                 if xvel > 0:
                     self.rect.right = p.rect.left
+                    self.xvel = 0  # remove xvel on contact
                 if xvel < 0:
                     self.rect.left = p.rect.right
+                    self.xvel = 0
                 if yvel > 0:
                     self.rect.bottom = p.rect.top
                     self.onGround = True

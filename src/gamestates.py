@@ -47,9 +47,9 @@ class PlayGameState(GameState):
         self.entities = pygame.sprite.Group()
         self.player = Player(32, 32, self)
         self.platforms = []
-        self.level_effects = [x(self.player) for x in levels[level_number][1]]
+        self.level_effects = [x(self.player) for x in levels[level_number].effects]
         self.level_number = level_number
-        self.level = levels[level_number][0]
+        self.level = levels[level_number].layout
         self.build_level(self.level)
         total_level_width = len(self.level[0]) * 32
         total_level_height = len(self.level) * 32
@@ -163,7 +163,7 @@ class MenuGameState(GameState):
         super().__init__(*args)
         self.bg_color = (0, 0, 0)
         self.menu_items = ('New game', 'Highscores', 'Options', "About", 'Quit')
-        self.menu_func = {'New game': self.engine.new_game,
+        self.menu_func = {'New game': self.engine.to_mode_screen,
                           'Highscores': self.engine.to_temp,
                           'Options': self.engine.to_temp,
                           'About': self.engine.to_temp,
@@ -248,7 +248,7 @@ class DeathScreenState(MenuGameState):
     def __init__(self, *args):
         super().__init__(*args)
         self.menu_items = ('Retry?', 'No, thanks')
-        self.menu_func = {'Retry?': self.engine.new_game,
+        self.menu_func = {'Retry?': self.engine.replay_lvl,
                           'No, thanks': self.engine.to_menu}
         self.font = pygame.font.SysFont("monospace", 50)
         self.setup_menu()
@@ -291,5 +291,29 @@ class RoundWinScreen(MenuGameState):
         self.menu_func = {'Next level': self.engine.to_next_lvl,
                           'Replay level': self.engine.replay_lvl,
                           'Menu': self.engine.to_menu}
+        self.font = pygame.font.SysFont("monospace", 50)
+        self.setup_menu()
+
+
+class ModeScreen(MenuGameState):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.menu_items = ('Levels', 'Infinite mode', "Back")
+        self.menu_func = {'Levels': self.engine.to_level_list,
+                          'Infinite mode': self.engine.to_temp,
+                          'Back': self.engine.to_menu}
+        self.font = pygame.font.SysFont("monospace", 50)
+        self.setup_menu()
+
+class LevelList(MenuGameState):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.menu_items = [str(x.number + 1) for x in levels]
+        print(self.menu_items)
+        self.menu_items.append('Back')
+        self.menu_func = {str(x.number + 1): self.engine.to_specific_lvl(x) for x in levels}
+        self.menu_func.update({'Back': self.engine.to_menu})
         self.font = pygame.font.SysFont("monospace", 50)
         self.setup_menu()

@@ -1,6 +1,6 @@
 import pygame
 from pygame import *
-from src.gamestates import PlayGameState, PauseGameState, MenuGameState, TempScreen, DeathScreenState, RoundWinScreen
+from src.gamestates import PlayGameState, PauseGameState, MenuGameState, TempScreen, DeathScreenState, RoundWinScreen, ModeScreen, LevelList
 from src.level_config import levels
 
 
@@ -15,7 +15,9 @@ class GameEngine:
                        PauseGameState(self),
                        TempScreen(self),
                        DeathScreenState(self),
-                       RoundWinScreen(self)]
+                       RoundWinScreen(self),
+                       ModeScreen(self),
+                       LevelList(self)]
         self.current_state = 0
 
     def main_loop(self):
@@ -62,5 +64,16 @@ class GameEngine:
         self.states[1] = PlayGameState(self, lvl)
         self.current_state = 1
 
+    def to_mode_screen(self):
+        self.current_state = 6
+
+    def to_specific_lvl(self, level):
+        def level_func():
+            self.states[1] = PlayGameState(self, level.number)
+            self.current_state = 1
+        return level_func
+
+    def to_level_list(self):
+        self.current_state = 7
 if __name__ == "__main__":
     GameEngine().main_loop()

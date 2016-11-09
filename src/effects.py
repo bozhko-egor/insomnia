@@ -55,8 +55,6 @@ class InertiaEffect(Effect):
             self.player.yvel += 0.3
             if self.player.yvel > self.player.max_vel:
                 self.player.yvel = self.player.max_vel
-        '''if not(left or right):
-            self.xvel = 0'''
         if self.player.xvel < 0:
             self.player.xvel += 0.1
         if self.player.xvel > 0:

@@ -21,8 +21,10 @@ class PlayerInfoText(Text):
         self.player = player
 
     def update(self, screen):
-        level_msg = "Speed: {}".format(int(self.player.yvel))
+        yspeed_msg = "ySpeed: {}".format(int(self.player.yvel))
+        xspeed_msg = "xSpeed: {}".format(int(self.player.xvel))
         score_msg = "Score: {}".format(self.player.score)
-        lives_msg = "Time: {}".format(int(self.player.timer))
-        for i, msg in enumerate([level_msg, score_msg, lives_msg]):
+        time_msg = "Time: {}".format(int(self.player.timer))
+
+        for i, msg in enumerate([yspeed_msg, xspeed_msg, score_msg, time_msg]):
             self.display_on_screen(screen, msg, 1, (255, 255, 255), self.x_coord, self.y_coord + i * 15)
