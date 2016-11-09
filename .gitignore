@@ -1,3 +1,4 @@
 *pyc
 /venv/*
 game.py
+/src/saves/*

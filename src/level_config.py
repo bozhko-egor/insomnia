@@ -12,4 +12,10 @@ class Level:
         self.best_time = 0
         self.number = number
 
-levels = [Level(level1, 0), Level(level2, 1, [InertiaEffect])]
+levels = [Level(level1, 0),
+          Level(level2, 1, [InertiaEffect]),
+          Level(level3, 2),
+          Level(level3, 3),
+          Level(level3, 4),
+          Level(level3, 5)]
+infinite_lvl = Level(infinite_start, 99)
