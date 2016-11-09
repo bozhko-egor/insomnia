@@ -190,10 +190,11 @@ class LevelList(MenuGameState):
         self.menu_func = {str(x.number + 1): self.engine.to_specific_lvl(x) for x in levels}
         self.menu_func.update({'Back': self.engine.to_mode_screen})
         self.font = pygame.font.SysFont("monospace", 50)
-        self.last_lvl = self.engine.last_completed_lvl()
+        self.last_lvl = self.engine.last_completed_lvl(self)
         self.hs_font = pygame.font.SysFont('monospace', 35)
-        self.hs_to_draw = None
-        self.setup_menu()
+        self.name = 'storymode'
+        if type(self) == LevelList:
+            self.setup_menu()
 
     def set_item_colors(self):
         for i, item in enumerate(self.items):
@@ -224,12 +225,9 @@ class LevelList(MenuGameState):
         if self.cur_item is None:
             return
         if self.cur_item <= self.last_lvl:
-            hs = self.engine.game_data['storymode'][self.cur_item]['highscore']
-            self.hs_to_draw = hs
+            hs = self.engine.game_data[self.name][self.cur_item]['highscore']
             label = self.hs_font.render('Highscore: {}'.format(hs), 1, (255, 255, 255))
             self.screen.blit(label, (200, 100))
-        else:
-            self.hs_to_draw = None
 
 
 class OptionsScreen(MenuGameState):
@@ -243,14 +241,16 @@ class OptionsScreen(MenuGameState):
         self.setup_menu()
 
 
-class DifficultyInfiniteMenu(MenuGameState):
+class DifficultyInfiniteMenu(LevelList):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.menu_items = ('Easy', 'Medium', "Hard", 'Back')
-        self.menu_func = {'Easy': self.engine.to_infinite_game,
-                          'Medium': self.engine.to_temp,
-                          'Hard': self.engine.to_temp,
+        self.menu_items = ('i can win', 'bring it on', 'hurt me plenty', 'hardcore', 'nightmare', 'Back')
+        self.menu_func = {'i can win': self.engine.to_infinite_game,
+                          'bring it on': self.engine.to_temp,
+                          'hurt me plenty': self.engine.to_temp,
+                          'hardcore': self.engine.to_temp,
+                          'nightmare': self.engine.to_temp,
                           'Back': self.engine.to_mode_screen}
-        self.font = pygame.font.SysFont("monospace", 50)
         self.setup_menu()
+        self.name = 'infinite'

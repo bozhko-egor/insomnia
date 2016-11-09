@@ -111,6 +111,8 @@ class PlayGameState(GameState):
                 self.engine.to_pause()
             elif event.key == K_q:
                 self.engine.to_win_menu()  # for testing purposes
+            elif event.key == K_d:
+                self.engine.to_death_screen(self.player)
             elif event.key == K_r:
                 self.engine.replay_lvl()
         if event.type == KEYUP:

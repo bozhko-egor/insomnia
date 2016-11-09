@@ -18,4 +18,4 @@ levels = [Level(level1, 0),
           Level(level3, 3),
           Level(level3, 4),
           Level(level3, 5)]
-infinite_lvl = Level(infinite_start, 99)
+infinite_lvl = Level(infinite_start, 0)
