@@ -44,7 +44,7 @@ class MenuGameState(GameState):
         self.items = []
         self.width = self.screen.get_rect().width
         self.height = self.screen.get_rect().height
-        self.cur_item = None
+        self.cur_item = 0
         if type(self) == MenuGameState:
             self.setup_menu()
 
@@ -71,6 +71,8 @@ class MenuGameState(GameState):
 
     def set_keyboard_selection(self, key):
         self.set_item_colors()
+        if key == pygame.K_ESCAPE:
+            self.engine.previous_menu(self)
         if self.cur_item is None:
             self.cur_item = 0
         else:
@@ -86,8 +88,8 @@ class MenuGameState(GameState):
         self.items[self.cur_item].set_font_color((255, 0, 0))
 
     def set_item_colors(self):
-        for item in self.items:
-            item.set_font_color((255, 255, 255))
+        for i, item in enumerate(self.items):
+                item.set_font_color((255, 255, 255))
 
     def setup_menu(self):
         for index, item in enumerate(self.menu_items):
@@ -100,6 +102,7 @@ class MenuGameState(GameState):
             menu_item.set_position(pos_x, pos_y)
             self.items.append(menu_item)
         self.set_item_colors()  # set initial colors
+        self.items[self.cur_item].set_font_color((255, 0, 0))
 
 
 class TempScreen(MenuGameState):

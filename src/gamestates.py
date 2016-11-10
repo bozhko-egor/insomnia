@@ -21,6 +21,7 @@ class OffsetCamera:
 
 
 class GameState:
+    """Parent Gamestate class that every state inherits from."""
 
     def __init__(self, engine):
         self.engine = engine
@@ -38,6 +39,7 @@ class GameState:
 
 
 class PlayGameState(GameState):
+    """Represents storymode gamestate."""
 
     def __init__(self, engine, level=levels[0]):
         super().__init__(engine)
@@ -61,6 +63,7 @@ class PlayGameState(GameState):
         pygame.time.set_timer(pygame.USEREVENT + 1, 250)
 
     def build_level(self, level):
+        """Build level layout."""
         x = y = 0
         for row in level:
             for col in row:
@@ -94,7 +97,7 @@ class PlayGameState(GameState):
 
     def input(self, event):
         if event.type == pygame.USEREVENT + 1:
-            self.player.timer += 0.25
+            self.player.timer += 0.25  # used in counting seconds
         if event.type == QUIT:
             self.exit()
 
@@ -138,10 +141,11 @@ class PlayGameState(GameState):
 
 
 class InfiniteGameState(PlayGameState):
+    """Represents infinite game mode."""
 
     def __init__(self, engine, level=infinite_lvl):
         super().__init__(engine, level)
-        self.camera = OffsetCamera(self.complex_camera, 640, 10**5)
+        self.camera = OffsetCamera(self.complex_camera, 640, 10**7)
 
     def draw(self):
         y = self.player.rect.top
@@ -149,10 +153,9 @@ class InfiniteGameState(PlayGameState):
             p = Platform(i, y + 350)
             self.platforms.append(p)
             self.entities.add(p)
-        for p in self.platforms[:]:
-            if p.rect.top - y > 850:
-                self.platforms.remove(p)
-                self.entities.remove(p)
+        if len(self.platforms) > 250:
+            for i in range(2):  # remove blocks from the queue that we have passed
+                self.entities.remove(self.platforms.pop(0))
         for y in range(32):
             for x in range(32):
                 self.screen.blit(self.bg, (x * 32, y * 32))

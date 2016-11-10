@@ -9,6 +9,11 @@ import pickle
 
 
 class GameEngine:
+    """
+    Main сlass with game loop.
+
+    Handles gamestate switching.
+    """
 
     def __init__(self):
         pygame.init()
@@ -18,7 +23,6 @@ class GameEngine:
                 self.game_data = pickle.load(f)
         except FileNotFoundError:
             self.reset_highscores()
-        print(self.game_data)
         self.current_state = 0
         self.state_list = [MenuGameState,
                            PlayGameState,
@@ -42,6 +46,17 @@ class GameEngine:
     def redraw_state(self, number, *args):
         self.states[number] = self.state_list[number](self, *args)
         self.current_state = number
+
+    def previous_menu(self, menu):
+        switch = {TempScreen: self.to_menu,
+                  OptionsScreen: self.to_menu,
+                  DifficultyInfiniteMenu: self.to_mode_screen,
+                  LevelList: self.to_mode_screen,
+                  ModeScreen: self.to_menu}
+        back_func = switch.get(type(menu), None)
+        if back_func is None:
+            return None
+        back_func()
 
     def to_game(self):
         self.current_state = 1
@@ -86,7 +101,7 @@ class GameEngine:
         lvl += 1
         if lvl > len(levels) - 1:
             lvl = 0
-        self.redraw_state(1, lvl)
+        self.redraw_state(1, levels[lvl])
 
     def replay_lvl(self):
         if type(self.states[1]) == PlayGameState:

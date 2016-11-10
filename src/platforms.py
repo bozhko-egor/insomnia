@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from .effects import SlowEffect
 
+
 class Platform(pygame.sprite.Sprite):
 
     def __init__(self, x, y):
