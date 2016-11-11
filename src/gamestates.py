@@ -21,7 +21,7 @@ class OffsetCamera:
 
 
 class GameState:
-    """Parent Gamestate class that every state inherits from."""
+    """Basic Gamestate class that every state inherits from."""
 
     def __init__(self, engine):
         self.engine = engine

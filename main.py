@@ -6,6 +6,7 @@ from src.menus import PauseGameState, MenuGameState, \
     OptionsScreen, DifficultyInfiniteMenu
 from src.level_config import levels
 import pickle
+import os
 
 
 class GameEngine:
@@ -22,7 +23,9 @@ class GameEngine:
             with open("src/saves/playerdata", "rb") as f:
                 self.game_data = pickle.load(f)
         except FileNotFoundError:
-            self.reset_highscores()
+            if not os.path.exists('src/saves/'):
+                os.makedirs('src/saves/')
+                self.reset_highscores()
         self.current_state = 0
         self.state_list = [MenuGameState,
                            PlayGameState,
