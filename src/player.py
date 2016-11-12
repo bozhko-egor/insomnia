@@ -58,6 +58,9 @@ class Player(pygame.sprite.Sprite):
             self.max_depth = self.rect.bottom
         self.score = self.pwup_score + self.max_depth // 100
 
+    def draw(self, screen, rect):
+        self.screen.blit(self.image, rect)
+
     def collide(self, xvel, yvel, platforms):
         for p in platforms[:]:
             if pygame.sprite.collide_rect(self, p):
@@ -116,3 +119,28 @@ class Player(pygame.sprite.Sprite):
             effect.set_effect(*args)
             effect.update(35, 700 + i * 15)
         return bool(len(self.gamestate.level_effects))
+
+
+class PlayerAnimated(Player):
+
+    def __init__(self, x, y, gamestate):
+        super().__init__(x, y, gamestate)
+        self.images = []
+        self.rect = Rect(x, y, 29, 12)
+        for i in range(1, 5):
+            self.images.append(pygame.image.load('src/sprites/player/INS_CHAR{}.png'.format(i)))
+        self.image = self.images[0]
+        self.image_generator = self.next_image()
+        self.time_stamp = 0.25
+        self.image.convert()
+
+    def next_image(self):
+        while True:
+            for i in self.images:
+                yield i
+
+    def update(self, *args):
+        super().update(*args)
+        if self.time_stamp < self.timer:
+            self.image = next(self.image_generator)
+            self.time_stamp = self.timer

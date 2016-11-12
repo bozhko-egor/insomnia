@@ -1,7 +1,7 @@
 import pygame
 import sys
 from pygame.locals import *
-from .player import Player
+from .player import Player, PlayerAnimated
 from .level_config import levels, infinite_lvl
 from .platforms import Platform, AlarmClock, PowerUp, SlowDown, ExitBlock
 from .gametext import PlayerInfoText
@@ -41,14 +41,14 @@ class GameState:
 class PlayGameState(GameState):
     """Represents storymode gamestate."""
 
-    def __init__(self, engine, level=levels[0]):
+    def __init__(self, engine, player=Player, level=levels[0]):
         super().__init__(engine)
         self.bg = pygame.Surface((32, 32))
         self.bg.convert()
         self.bg.fill(Color("#000000"))
         self.entities = pygame.sprite.Group()
-        self.player = Player(32, 32, self)
         self.level = level
+        self.player = player(32, 32, self)
         self.platforms = []
         self.level_effects = [x(self.player) for x in level.effects]
         self.level_number = level.number
@@ -93,7 +93,7 @@ class PlayGameState(GameState):
         self.camera.update(self.player)
         self.text.update(self.screen)
         self.player.update(self.up, self.down, self.left, self.right, self.platforms)
-        pygame.display.update()
+        pygame.display.flip()
 
     def input(self, event):
         if event.type == pygame.USEREVENT + 1:
@@ -143,8 +143,8 @@ class PlayGameState(GameState):
 class InfiniteGameState(PlayGameState):
     """Represents infinite game mode."""
 
-    def __init__(self, engine, level=infinite_lvl):
-        super().__init__(engine, level)
+    def __init__(self, engine, player=Player, level=infinite_lvl):
+        super().__init__(engine, player, level)
         self.camera = OffsetCamera(self.complex_camera, 640, 10**7)
 
     def draw(self):

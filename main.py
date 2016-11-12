@@ -3,8 +3,9 @@ from pygame import *
 from src.gamestates import PlayGameState, InfiniteGameState
 from src.menus import PauseGameState, MenuGameState, \
     TempScreen, DeathScreenState, RoundWinScreen, ModeScreen, LevelList, \
-    OptionsScreen, DifficultyInfiniteMenu
+    OptionsScreen, DifficultyInfiniteMenu, PlayerSelectScreen
 from src.level_config import levels
+from src.player import PlayerAnimated
 import pickle
 import os
 
@@ -25,7 +26,7 @@ class GameEngine:
         except FileNotFoundError:
             if not os.path.exists('src/saves/'):
                 os.makedirs('src/saves/')
-                self.reset_highscores()
+            self.reset_highscores()
         self.current_state = 0
         self.state_list = [MenuGameState,
                            PlayGameState,
@@ -36,7 +37,8 @@ class GameEngine:
                            ModeScreen,
                            LevelList,
                            OptionsScreen,
-                           DifficultyInfiniteMenu]
+                           DifficultyInfiniteMenu,
+                           PlayerSelectScreen]
         self.states = [x(self) for x in self.state_list]
 
     def main_loop(self):
@@ -75,6 +77,11 @@ class GameEngine:
 
     def new_game(self):
         self.redraw_state(1)
+
+    def to_animated(self):
+        level = self.states[1].level
+        self.states[1] = PlayGameState(self, player=PlayerAnimated, level=level)
+        self.current_state = 1
 
     def to_death_screen(self, player):
         if type(player.gamestate) == InfiniteGameState:
@@ -119,7 +126,8 @@ class GameEngine:
 
     def to_specific_lvl(self, level):
         def level_func():
-            self.redraw_state(1, level)
+            self.states[1] = self.state_list[1](self, level=level)
+            self.current_state = 10
         return level_func
 
     def to_level_list(self):
@@ -134,6 +142,9 @@ class GameEngine:
     def to_infinite_game(self):
         self.states[1] = InfiniteGameState(self)
         self.current_state = 1
+
+    def to_player_select(self):
+        self.redraw_state(10)
 
     def save_player_data(self):
         with open("src/saves/playerdata", "wb") as f:

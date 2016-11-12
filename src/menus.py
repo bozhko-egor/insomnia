@@ -257,3 +257,15 @@ class DifficultyInfiniteMenu(LevelList):
                           'Back': self.engine.to_mode_screen}
         self.setup_menu()
         self.name = 'infinite'
+
+
+class PlayerSelectScreen(MenuGameState):
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.menu_items = ('Player', 'Animated Player', 'Back')
+        self.menu_func = {'Player': self.engine.to_game,
+                          'Animated Player': self.engine.to_animated,
+                          'Back': self.engine.to_menu}
+        self.font = pygame.font.SysFont("monospace", 50)
+        self.setup_menu()
