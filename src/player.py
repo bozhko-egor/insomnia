@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from src.platforms import AlarmClock, PowerUp, SlowDown, ExitBlock
 from .effects import DefaultEffect
-
+import os
 
 class Player(pygame.sprite.Sprite):
 
@@ -127,8 +127,9 @@ class PlayerAnimated(Player):
         super().__init__(x, y, gamestate)
         self.images = []
         self.rect = Rect(x, y, 29, 12)
+        os.chdir('src/sprites/player/')
         for i in range(1, 5):
-            self.images.append(pygame.image.load('src/sprites/player/INS_CHAR{}.png'.format(i)))
+            self.images.append(pygame.image.load('INS_CHAR{}.png'.format(i)))
         self.image = self.images[0]
         self.image_generator = self.next_image()
         self.time_stamp = 0.25
