@@ -22,7 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.level = 1
         self.timer = 0
         self.status_effects = []
-        self.max_vel = 25
+        self.max_vel = 10
         self.max_depth = 0
 
     def update(self, up, down, left, right, platforms):

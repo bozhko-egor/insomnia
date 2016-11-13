@@ -111,12 +111,13 @@ class GameEngine:
         lvl += 1
         if lvl > len(levels) - 1:
             lvl = 0
-        self.redraw_state(1, levels[lvl])
+        self.redraw_state(1, type(self.states[1].player), levels[lvl])
 
     def replay_lvl(self):
         if type(self.states[1]) == PlayGameState:
             lvl = self.states[1].level
-            self.states[1] = PlayGameState(self, lvl)
+
+            self.states[1] = PlayGameState(self, type(self.states[1].player), level=lvl)
         elif type(self.states[1]) == InfiniteGameState:
             self.states[1] = InfiniteGameState(self)
         self.current_state = 1
