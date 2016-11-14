@@ -43,9 +43,9 @@ class PlayGameState(GameState):
 
     def __init__(self, engine, player=Player, level=levels[0]):
         super().__init__(engine)
-        self.bg = pygame.Surface((32, 32))
-        self.bg.convert()
-        self.bg.fill(Color("#000000"))
+        self.bg = pygame.image.load('src/sprites/backgrounds/background.png')
+        #self.bg.convert()
+        # self.bg.fill(Color("#000000"))
         self.entities = pygame.sprite.Group()
         self.level = level
         self.player = player(32, 32, self)
@@ -82,9 +82,12 @@ class PlayGameState(GameState):
             x = 0
 
     def draw(self):
-        for y in range(32):
-            for x in range(32):
-                self.screen.blit(self.bg, (x * 32, y * 32))
+        img_height = self.bg.get_height()
+        diff = img_height - self.height
+        diff2 = len(self.level.layout) * 32 - self.height
+        dy = diff2 // diff
+        y = self.camera.state.top // dy
+        self.screen.blit(self.bg, (0, y))
         for e in self.entities:
             self.screen.blit(e.image, self.camera.apply(e))
 
