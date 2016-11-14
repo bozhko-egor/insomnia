@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from src.platforms import AlarmClock, PowerUp, SlowDown, ExitBlock
 from .effects import DefaultEffect
-
+from .items import Magnet
 
 class Player(pygame.sprite.Sprite):
 
@@ -24,8 +24,11 @@ class Player(pygame.sprite.Sprite):
         self.status_effects = []
         self.max_vel = 10
         self.max_depth = 0
+        self.item = Magnet(self.gamestate)
 
     def update(self, up, down, left, right, platforms):
+        if self.item:
+            self.item.update()
         self.check_status_effects()
         if not self.check_level_effects(up, down, left, right):  # using alternate mechanics
             if up:

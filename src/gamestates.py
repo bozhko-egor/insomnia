@@ -116,6 +116,9 @@ class PlayGameState(GameState):
                 self.right = True
             elif event.key in [K_ESCAPE, K_p]:
                 self.engine.to_pause()
+            elif event.key == K_SPACE:
+                if not self.player.item.cd_left:
+                    self.player.item.turn_on()
             elif event.key == K_q:
                 self.engine.to_win_menu()  # for testing purposes
             elif event.key == K_d:
