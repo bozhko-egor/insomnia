@@ -40,6 +40,7 @@ class GameEngine:
                            DifficultyInfiniteMenu,
                            PlayerSelectScreen]
         self.states = [x(self) for x in self.state_list]
+        
 
     def main_loop(self):
         while True:

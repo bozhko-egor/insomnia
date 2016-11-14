@@ -74,7 +74,7 @@ class PlayGameState(GameState):
                                    "E": ExitBlock}
                 plat_class = platform_switch.get(col, None)
                 if plat_class:
-                    p = plat_class(x, y)
+                    p = plat_class(self, x, y)
                     self.platforms.append(p)
                     self.entities.add(p)
                 x += 32
@@ -89,6 +89,10 @@ class PlayGameState(GameState):
             self.screen.blit(e.image, self.camera.apply(e))
 
     def update(self):
+        for p in self.entities:
+            if type(p) in [Player, PlayerAnimated]:
+                continue
+            p.update()
         self.timer.tick(60)
         self.camera.update(self.player)
         self.text.update(self.screen)
