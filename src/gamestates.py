@@ -3,7 +3,7 @@ import sys
 from pygame.locals import *
 from .player import Player, PlayerAnimated
 from .level_config import levels, infinite_lvl
-from .platforms import Platform, AlarmClock, PowerUp, SlowDown, ExitBlock
+from .platforms import Platform, AlarmClock, PowerUp, SlowDown, ExitBlock, MovingPlatform
 from .gametext import PlayerInfoText
 
 
@@ -33,7 +33,8 @@ class GameState:
         self.screen = pygame.display.set_mode(self.screen_res, self.flags, self.depth)
         self.timer = pygame.time.Clock()
 
-    def exit(self):
+    @staticmethod
+    def exit():
         pygame.quit()
         sys.exit()
 
@@ -71,7 +72,8 @@ class PlayGameState(GameState):
                                    "A": AlarmClock,
                                    "U": PowerUp,
                                    "S": SlowDown,
-                                   "E": ExitBlock}
+                                   "E": ExitBlock,
+                                   "M": MovingPlatform}
                 plat_class = platform_switch.get(col, None)
                 if plat_class:
                     p = plat_class(self, x, y)
@@ -84,7 +86,7 @@ class PlayGameState(GameState):
     def draw(self):
         img_height = self.bg.get_height()
         diff = img_height - self.height
-        diff2 = len(self.level.layout) * 32 - self.height
+        diff2 = len(self.level.layout) * 32 - self.height  # background parallax
         dy = diff2 // diff
         y = self.camera.state.top // dy
         self.screen.blit(self.bg, (0, y))
@@ -96,7 +98,7 @@ class PlayGameState(GameState):
             if type(p) in [Player, PlayerAnimated]:
                 continue
             p.update()
-        self.timer.tick(60)
+        self.timer.tick(45)
         self.camera.update(self.player)
         self.text.update(self.screen)
         self.player.update(self.up, self.down, self.left, self.right, self.platforms)
@@ -160,7 +162,7 @@ class InfiniteGameState(PlayGameState):
     def draw(self):
         y = self.player.rect.top
         for i in [0, 608]:  # screen width
-            p = Platform(i, y + 350)
+            p = Platform(self, i, y + 350)
             self.platforms.append(p)
             self.entities.add(p)
         if len(self.platforms) > 250:

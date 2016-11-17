@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 from .effects import SlowEffect
-
+from math import cos, sin, pi
 
 class Platform(pygame.sprite.Sprite):
 
@@ -22,6 +22,56 @@ class Platform(pygame.sprite.Sprite):
 
     def update(self):
         pass
+
+
+class MovingPlatform(Platform):
+
+    def __init__(self, gamestate, x, y):
+        super().__init__(gamestate, x, y)
+        self.image = pygame.Surface((256, 10))
+        self.rect = Rect(x, y, 256, 10)
+        self.image.fill(Color("#555500"))
+        self.starting_point = (x, y)
+        self.speed = 1
+        self.distance = 200
+        self.radius = 75
+        self.pi_gene = self.pi_generator()
+        self.delta = None
+
+    def update(self):
+        t = next(self.pi_gene)
+        self.rect.left = self.x_func(t)
+        self.rect.top = self.y_func(t)
+
+    def x_func(self, t):
+        x = self.starting_point[0] + self.radius * cos(t)
+        return x
+
+    def y_func(self, t):
+        y = self.starting_point[1] + self.radius * sin(t)
+        return y
+
+    def pi_generator(self):
+        point = 0
+        while True:
+            if point > 2 * pi:
+                point = 0
+            yield point
+            point += 0.01
+
+    def collision_handler(self, xvel, yvel, player):
+        if player.rect.bottom >= self.rect.top:
+            player.rect.bottom = self.rect.top
+            if yvel > 0:
+                player.onGround = True
+                player.yvel = 0
+        else:
+            if xvel > 0:
+                player.rect.right = self.rect.left
+                player.xvel = 0  # remove xvel on contact
+            if xvel < 0:
+                player.rect.left = self.rect.right
+                player.xvel = 0
 
 
 class AlarmClock(Platform):

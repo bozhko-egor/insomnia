@@ -1,8 +1,9 @@
 import pygame
 from pygame.locals import *
-from src.platforms import AlarmClock, PowerUp, SlowDown, ExitBlock
+from src.platforms import AlarmClock, PowerUp, SlowDown, ExitBlock, MovingPlatform
 from .effects import DefaultEffect
 from .items import Magnet
+
 
 class Player(pygame.sprite.Sprite):
 
@@ -85,6 +86,9 @@ class Player(pygame.sprite.Sprite):
                     return
                 if isinstance(p, ExitBlock):
                     self.gamestate.engine.to_win_menu()
+                if isinstance(p, MovingPlatform):
+                    p.collision_handler(xvel, yvel, self)
+                    continue
                 if xvel > 0:
                     self.rect.right = p.rect.left
                     self.xvel = 0  # remove xvel on contact

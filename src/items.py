@@ -64,9 +64,9 @@ class Magnet(Item):
             dx = - dx if x1 < x else dx
             dy = - dy if y1 < y else dy
             e.rect.left += dx
+            e.rect.top += dy
             self.gamestate.platforms[index].rect.left += dx
             self.gamestate.platforms[index].rect.top += dy
-            e.rect.top += dy
 
     def turn_on(self):
         self.start_time = self.gamestate.player.timer

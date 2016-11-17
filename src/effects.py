@@ -18,7 +18,7 @@ class Effect:
 class DefaultEffect(Effect):
 
     def default_effects(self):
-        self.player.max_vel = 30
+        self.player.max_vel = 10
 
 
 class SlowEffect(Effect):
