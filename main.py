@@ -48,7 +48,7 @@ class GameEngine:
             self.states[self.current_state].update()
             for event in pygame.event.get():
                 self.states[self.current_state].input(event)
-            
+
     def redraw_state(self, number, *args):
         self.states[number] = self.state_list[number](self, *args)
         self.current_state = number

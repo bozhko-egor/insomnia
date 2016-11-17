@@ -123,3 +123,58 @@ class SlowDown(Platform):
         if self.time_stamp < self.gamestate.player.timer and not self.gamestate.player.timer % self.period:
             self.image = next(self.img_gen)
             self.time_stamp = self.gamestate.player.timer
+
+
+class WindArea(Platform):
+
+    def __init__(self, gamestate, x, y):
+        super().__init__(gamestate, x, y)
+        self.image = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
+        self.rect = Rect(x, y, 32, 32)
+        self.image.fill((255, 0, 0, 150))
+        self.starting_point = (x, y)
+        self.x_speed = -0.85
+        self.y_speed = 0
+
+    def collision_handler(self, player):
+        if self.rect.colliderect(player.rect):
+            player.xvel += self.x_speed
+            player.yvel += self.y_speed
+
+
+class Teleport(Platform):
+
+    _instances = []
+
+    def __init__(self, gamestate, x, y, index):
+        super().__init__(gamestate, x, y)
+        self.image = pygame.Surface((32, 32))
+        self.index = index
+        self.rect = Rect(x, y, 32, 32)
+        self.image.fill((255, 255, 255))
+        self.starting_point = (x, y)
+        self._instances.append(self)
+        self.linked_tp = self.get_linked_tp()
+
+    def get_linked_tp(self):
+        tp = None
+        for instance in self._instances:
+            if self.index == instance.index and instance != self:
+                tp = instance
+        if tp and not tp.linked_tp:
+            tp.linked_tp = self
+        return tp
+
+    def collision_handler(self, xvel, yvel, player):
+        if xvel > 0:
+            player.rect.left = self.linked_tp.rect.right
+            player.rect.top = self.linked_tp.rect.top
+        if xvel < 0:
+            player.rect.right = self.linked_tp.rect.left
+            player.rect.top = self.linked_tp.rect.top
+        if yvel > 0:
+            player.rect.top = self.linked_tp.rect.bottom
+            player.rect.left = self.linked_tp.rect.left
+        if yvel < 0:
+            player.rect.bottom = self.linked_tp.rect.top
+            player.rect.left = self.linked_tp.rect.left

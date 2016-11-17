@@ -3,7 +3,7 @@ import sys
 from pygame.locals import *
 from .player import Player, PlayerAnimated
 from .level_config import levels, infinite_lvl
-from .platforms import Platform, AlarmClock, PowerUp, SlowDown, ExitBlock, MovingPlatform
+from .platforms import Platform, AlarmClock, PowerUp, SlowDown, ExitBlock, MovingPlatform, WindArea, Teleport
 from .gametext import PlayerInfoText
 
 
@@ -45,8 +45,6 @@ class PlayGameState(GameState):
     def __init__(self, engine, player=Player, level=levels[0]):
         super().__init__(engine)
         self.bg = pygame.image.load('src/sprites/backgrounds/background.png')
-        #self.bg.convert()
-        # self.bg.fill(Color("#000000"))
         self.entities = pygame.sprite.Group()
         self.level = level
         self.player = player(32, 32, self)
@@ -65,6 +63,7 @@ class PlayGameState(GameState):
 
     def build_level(self, level):
         """Build level layout."""
+        Teleport._instances = []  # temp workaround
         x = y = 0
         for row in level:
             for col in row:
@@ -73,10 +72,20 @@ class PlayGameState(GameState):
                                    "U": PowerUp,
                                    "S": SlowDown,
                                    "E": ExitBlock,
-                                   "M": MovingPlatform}
+                                   "M": MovingPlatform,
+                                   "W": WindArea,
+                                   "0": Teleport,
+                                   "1": Teleport,
+                                   "2": Teleport,
+                                   "3": Teleport,
+                                   "4": Teleport,
+                                   "5": Teleport}
                 plat_class = platform_switch.get(col, None)
                 if plat_class:
-                    p = plat_class(self, x, y)
+                    if col in '012345':
+                        p = plat_class(self, x, y, col)
+                    else:
+                        p = plat_class(self, x, y)
                     self.platforms.append(p)
                     self.entities.add(p)
                 x += 32

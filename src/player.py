@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-from src.platforms import AlarmClock, PowerUp, SlowDown, ExitBlock, MovingPlatform
+from src.platforms import AlarmClock, PowerUp, SlowDown, ExitBlock, MovingPlatform, WindArea, Teleport
 from .effects import DefaultEffect
 from .items import Magnet
 
@@ -38,15 +38,21 @@ class Player(pygame.sprite.Sprite):
             if down:
                 pass
             if left:
-                self.xvel = -8
+                self.xvel -= 0.5
             if right:
-                self.xvel = 8
+                self.xvel += 0.5
             if not self.onGround:
                 self.yvel += 0.3
                 if self.yvel > self.max_vel:
                     self.yvel = self.max_vel
             if not(left or right):
-                self.xvel = 0
+                if abs(self.xvel) < 0.5:
+                    self.xvel = 0
+                if self.xvel > 0:
+                    self.xvel -= 0.4
+                else:
+                    self.xvel += 0.4
+
         # increment in x direction
         self.rect.left += self.xvel
         # do x-axis collisions
@@ -87,6 +93,12 @@ class Player(pygame.sprite.Sprite):
                 if isinstance(p, ExitBlock):
                     self.gamestate.engine.to_win_menu()
                 if isinstance(p, MovingPlatform):
+                    p.collision_handler(xvel, yvel, self)
+                    continue
+                if isinstance(p, WindArea):
+                    p.collision_handler(self)
+                    continue
+                if isinstance(p, Teleport):
                     p.collision_handler(xvel, yvel, self)
                     continue
                 if xvel > 0:
