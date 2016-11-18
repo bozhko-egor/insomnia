@@ -2,7 +2,7 @@ import pygame
 import sys
 from pygame.locals import *
 from .player import Player, PlayerAnimated
-from .level_config import levels, infinite_lvl
+from .level_config import levels
 from .platforms import Platform, AlarmClock, PowerUp, SlowDown, ExitBlock, MovingPlatform, WindArea, Teleport
 from .gametext import PlayerInfoText
 
@@ -45,24 +45,26 @@ class PlayGameState(GameState):
     def __init__(self, engine, player=Player, level=levels[0]):
         super().__init__(engine)
         self.bg = pygame.image.load('src/sprites/backgrounds/background.png')
+        #self.bg.convert()
         self.entities = pygame.sprite.Group()
-        self.level = level
-        self.player = player(32, 32, self)
         self.platforms = []
+        self.level = level
+        self.build_level(level.level)
+        self.player = player(32, 32, self)
         self.level_effects = [x(self.player) for x in level.effects]
         self.level_number = level.number
-        self.level_layout = level.layout
-        self.build_level(self.level_layout)
-        total_level_width = len(self.level_layout[0]) * 32
-        total_level_height = len(self.level_layout) * 32
-        self.camera = OffsetCamera(self.complex_camera, total_level_width, total_level_height)
+        #self.level_layout = level.layout
+        #self.build_level(self.level_layout)
+        #total_level_width = len(self.level_layout[0]) * 32
+        #total_level_height = len(self.level_layout) * 32
+        self.camera = OffsetCamera(self.complex_camera, self.level_width, self.level_height)
         self.entities.add(self.player)
         self.text = PlayerInfoText(self.player, 500, 50, "monospace", 17)
         self.up = self.down = self.left = self.right = False
         pygame.time.set_timer(pygame.USEREVENT + 1, 250)
 
+        '''
     def build_level(self, level):
-        """Build level layout."""
         Teleport._instances = []  # temp workaround
         x = y = 0
         for row in level:
@@ -91,11 +93,27 @@ class PlayGameState(GameState):
                 x += 32
             y += 32
             x = 0
+            '''
+    def build_level(self, layout):
+        max_w = 0
+        max_h = 0
+        for platform in layout:
+            p_type, rect = platform
+            x, y, w, h = rect.left, rect.top, rect.width, rect.height
+            if y > max_h:
+                max_h = y
+            if x > max_w:
+                max_w = x
+            block = p_type(self, x, y, w=w, h=h)
+            self.platforms.append(block)
+            self.entities.add(block)
+        self.level_width = max_w + 32
+        self.level_height = max_h + 32
 
     def draw(self):
         img_height = self.bg.get_height()
         diff = img_height - self.height
-        diff2 = len(self.level.layout) * 32 - self.height  # background parallax
+        diff2 = self.level_height - self.height  # background parallax
         dy = diff2 // diff
         y = self.camera.state.top // dy
         self.screen.blit(self.bg, (0, y))
@@ -164,7 +182,7 @@ class PlayGameState(GameState):
 class InfiniteGameState(PlayGameState):
     """Represents infinite game mode."""
 
-    def __init__(self, engine, player=Player, level=infinite_lvl):
+    def __init__(self, engine, player=Player, level=[]):
         super().__init__(engine, player, level)
         self.camera = OffsetCamera(self.complex_camera, 640, 10**7)
 

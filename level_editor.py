@@ -6,11 +6,12 @@ import pickle
 from src.editor.errors import NoSuchLevel
 import os
 
+
 class LevelEditor:
 
     def __init__(self):
-        if not os.path.exists('src/editor/levels'):
-            os.makedirs('src/editor/levels')
+        if not os.path.exists('src/levels'):
+            os.makedirs('src/levels')
         pygame.init()
         pygame.display.set_caption("Level editor")
         self.current_state = 1
@@ -30,12 +31,12 @@ class LevelEditor:
 
     def save_level(self, name):
         level_data = [[type(x), x.rect] for x in self.states[0].platforms]
-        with open("src/editor/levels/{}".format(name), "wb") as f:
+        with open("src/levels/{}".format(name), "wb") as f:
             pickle.dump(level_data, f)
 
     def load_level(self, name):
         try:
-            with open("src/editor/levels/{}".format(name), "rb") as f:
+            with open("src/levels/{}".format(name), "rb") as f:
                 level = pickle.load(f)
         except FileNotFoundError:
             raise NoSuchLevel

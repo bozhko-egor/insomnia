@@ -2,3 +2,4 @@
 /venv/*
 game.py
 /src/saves/*
+/src/editor/levels/*
