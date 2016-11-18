@@ -1,9 +1,7 @@
 import pygame
-import sys
 from pygame.locals import *
 from src.gamestates import GameState, OffsetCamera
 from .dummy_player import DummyPlayer
-import pickle
 
 
 class EditorState(GameState):
@@ -23,6 +21,14 @@ class EditorState(GameState):
         self.time = 0
         self.message_screen = []
         pygame.time.set_timer(pygame.USEREVENT + 1, 500)
+
+    def build_level(self, layout):
+        for platform in layout:
+            p_type, rect = platform
+            x, y, w, h = rect.left, rect.top, rect.width, rect.height
+            block = p_type(self, x, y, w=w, h=h)
+            self.entities.add(block)
+            self.platforms.append(block)
 
     def draw(self):
         for y in range(32):
@@ -81,16 +87,7 @@ class EditorState(GameState):
                                                 self.player.rect.left,
                                                 self.player.rect.top)
         self.entities.add(block)  # probably need to add collision
-
-    def save_level(self, name):
-        level = (self.platforms, self.entities[:].remove(self.player))
-        with open("src/editor/levels/{}".format(name), "wb") as f:
-            pickle.dump(level, f)
-
-    def load_level(self, name):
-        with open("src/editor/levels/{}".format(name), "rb") as f:
-            level = pickle.load(f)
-        return level
+        self.platforms.append(block)
 
     def complex_camera(self, camera, target_rect):
         l, t, _, _ = target_rect

@@ -1,0 +1,2 @@
+class NoSuchLevel(Exception):
+    pass

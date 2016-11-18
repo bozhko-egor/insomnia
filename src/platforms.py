@@ -6,16 +6,16 @@ from math import cos, sin, pi
 
 class Platform(pygame.sprite.Sprite):
 
-    def __init__(self, gamestate, x, y):
+    def __init__(self, gamestate, x, y, w=32, h=32):
         super().__init__()
         self.images = []
         self.gamestate = gamestate
-        self.image = pygame.Surface((32, 32))
+        self.image = pygame.Surface((w, h))
         self.image.convert()
         self.image.fill(Color("#DDDDDD"))
-        self.rect = Rect(x, y, 32, 32)
+        self.rect = Rect(x, y, w, h)
         self.tick_period = None
-    
+
     def next_image(self):
         while True:
             for i in self.images:
@@ -77,11 +77,11 @@ class MovingPlatform(Platform):
 
 class AlarmClock(Platform):
 
-    def __init__(self, gamestate, x, y):
+    def __init__(self, gamestate, x, y, w=25, h=11):
         super().__init__(gamestate, x, y)
         for i in range(2):
             self.images.append(pygame.image.load('src/sprites/platforms/alarmclock/INS_ALARM{}.png'.format(i + 1)))
-        self.rect = Rect(x, y, 25, 11)
+        self.rect = Rect(x, y, w, h)
         self.period = 1
         self.image = self.images[0]
         self.img_gen = self.next_image()
@@ -95,26 +95,26 @@ class AlarmClock(Platform):
 
 class PowerUp(Platform):
 
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.image.fill(Color("#0000FF"))
 
 
 class ExitBlock(Platform):
 
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.image.fill(Color("#DD00FF"))
 
 
 class SlowDown(Platform):
 
-    def __init__(self, gamestate, x, y):
+    def __init__(self, gamestate, x, y, w=32, h=32):
         super().__init__(gamestate, x, y)
         self.effect = SlowEffect
         for i in range(4):
             self.images.append(pygame.image.load('src/sprites/platforms/slowdown/INS_PWRUP{}.png'.format(i + 1)))
-        self.rect = Rect(x, y, 32, 32)
+        self.rect = Rect(x, y, w, h)
         self.period = 0.5
         self.image = self.images[0]
         self.img_gen = self.next_image()
@@ -128,10 +128,10 @@ class SlowDown(Platform):
 
 class WindArea(Platform):
 
-    def __init__(self, gamestate, x, y):
+    def __init__(self, gamestate, x, y, w=32, h=32):
         super().__init__(gamestate, x, y)
-        self.image = pygame.Surface((32, 32), pygame.SRCALPHA, 32)
-        self.rect = Rect(x, y, 32, 32)
+        self.image = pygame.Surface((w, h), pygame.SRCALPHA, 32)
+        self.rect = Rect(x, y, w, h)
         self.image.fill((255, 0, 0, 150))
         self.starting_point = (x, y)
         self.x_speed = -0.85
@@ -147,11 +147,11 @@ class Teleport(Platform):
 
     _instances = []
 
-    def __init__(self, gamestate, x, y, index):
+    def __init__(self, gamestate, x, y, index, w=32, h=32):
         super().__init__(gamestate, x, y)
-        self.image = pygame.Surface((32, 32))
+        self.image = pygame.Surface((w, h))
         self.index = index
-        self.rect = Rect(x, y, 32, 32)
+        self.rect = Rect(x, y, w, h)
         self.image.fill((255, 255, 255))
         self.starting_point = (x, y)
         self._instances.append(self)
