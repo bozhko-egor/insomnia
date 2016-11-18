@@ -89,7 +89,7 @@ class MenuGameState(GameState):
 
     def set_item_colors(self):
         for i, item in enumerate(self.items):
-                item.set_font_color((255, 255, 255))
+                item.set_font_color(self.font_color)
 
     def setup_menu(self):
         for index, item in enumerate(self.menu_items):

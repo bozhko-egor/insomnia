@@ -3,6 +3,7 @@ from pygame.locals import *
 from .effects import SlowEffect
 from math import cos, sin, pi
 
+
 class Platform(pygame.sprite.Sprite):
 
     def __init__(self, gamestate, x, y):
@@ -14,7 +15,7 @@ class Platform(pygame.sprite.Sprite):
         self.image.fill(Color("#DDDDDD"))
         self.rect = Rect(x, y, 32, 32)
         self.tick_period = None
-
+    
     def next_image(self):
         while True:
             for i in self.images:

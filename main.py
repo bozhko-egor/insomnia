@@ -8,7 +8,6 @@ from src.level_config import levels
 from src.player import PlayerAnimated
 import pickle
 import os
-import time
 
 
 class GameEngine:
