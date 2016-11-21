@@ -25,7 +25,7 @@ class SlowEffect(Effect):
 
     def __init__(self, player):
         super().__init__(player)
-        self.duration = 2
+        self.duration = 1
         self.time_left = 0
         self.start_time = None
         self.name = 'slowed'

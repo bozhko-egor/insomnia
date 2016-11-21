@@ -3,7 +3,7 @@ from pygame.locals import *
 from src.gamestates import GameState, OffsetCamera
 from .dummy_player import DummyPlayer
 from src.platforms import Platform, WindArea
-
+from src.editor.menu import PauseScreen
 
 class EditorState(GameState):
 
@@ -88,6 +88,11 @@ class EditorState(GameState):
                 self.redo_last_action()
             elif event.key == K_q:
                 self.setup_wind_block()
+            elif chr(event.key) in ''.join([str(x) for x in range(1, 10)]):
+                block_switch = {str(i + 1): name for i, name in enumerate(PauseScreen(self.engine).blocks.values())}
+                print(block_switch)
+                block = block_switch.get(chr(event.key), None)
+                self.player.current_block = block(self, self.player.rect.left, self.player.rect.top)
 
         if event.type == KEYUP:
             if event.key == K_UP:

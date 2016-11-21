@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 from src.platforms import AlarmClock, PowerUp, SlowDown, ExitBlock, MovingPlatform, WindArea, Teleport
-from .effects import DefaultEffect
+from .effects import DefaultEffect, SlowEffect
 from .items import Magnet
 
 
@@ -86,9 +86,7 @@ class Player(pygame.sprite.Sprite):
                     self.gamestate.platforms.remove(p)
                     self.gamestate.entities.remove(p)
                     effect = p.effect(self)
-                    if not self.check_effect(effect):
-                        effect.start_time = self.timer
-                        self.status_effects.append(effect)
+                    self.add_effect(effect)
                     return
                 if isinstance(p, ExitBlock):
                     self.gamestate.engine.to_win_menu()
@@ -104,9 +102,11 @@ class Player(pygame.sprite.Sprite):
                 if xvel > 0:
                     self.rect.right = p.rect.left
                     self.xvel = 0  # remove xvel on contact
+                    self.add_without_duration(SlowEffect(self))
                 if xvel < 0:
                     self.rect.left = p.rect.right
                     self.xvel = 0
+                    self.add_without_duration(SlowEffect(self))
                 if yvel > 0:
                     self.rect.bottom = p.rect.top
                     self.onGround = True
@@ -114,6 +114,18 @@ class Player(pygame.sprite.Sprite):
                 if yvel < 0:
                     self.yvel = 0  # lose speed on *head* contact with platform
                     self.rect.top = p.rect.bottom
+
+    def add_effect(self, effect):
+        if not self.check_effect(effect):
+            effect.start_time = self.timer
+            self.status_effects.append(effect)
+
+    def add_without_duration(self, effect):
+        if type(effect) in [type(x) for x in self.status_effects]:
+            return
+        else:
+            self.status_effects.append(effect)
+            effect.start_time = self.timer
 
     def check_effect(self, effect):
         for element in self.status_effects[:]:
