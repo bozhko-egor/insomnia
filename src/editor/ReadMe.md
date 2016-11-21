@@ -7,6 +7,7 @@
 4. `z` - undo last action
 5. `i` - place cursor into nearest 32p*32p tile
 6. `t` - cursor moving in 32p increments (toggle)
+7. `r` - select last used block
 
 
 

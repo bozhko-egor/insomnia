@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from src.gamestates import GameState, OffsetCamera
 from .dummy_player import DummyPlayer
-from src.platforms import Platform
+from src.platforms import Platform, WindArea
 
 
 class EditorState(GameState):
@@ -27,9 +27,9 @@ class EditorState(GameState):
 
     def build_level(self, layout):
         for platform in layout:
-            p_type, rect = platform
+            p_type, rect, args = platform
             x, y, w, h = rect.left, rect.top, rect.width, rect.height
-            block = p_type(self, x, y, w=w, h=h)
+            block = p_type(self, x, y, *args, w=w, h=h)
             self.entities.add(block)
             self.platforms.append(block)
 
@@ -71,7 +71,7 @@ class EditorState(GameState):
             elif event.key == K_ESCAPE:
                 self.engine.to_pause()
             elif event.key == K_SPACE:
-                self.add_block()
+                self.add_block(self.player.rect.left, self.player.rect.top)
             elif event.key == K_c:
                 self.player.collision = not(self.player.collision)  # collision toggler
             elif event.key == K_i:
@@ -84,6 +84,11 @@ class EditorState(GameState):
                 self.undo_last_action()
             elif event.key == K_t:
                 self.player.t_move = not(self.player.t_move)
+            elif event.key == K_r:
+                self.redo_last_action()
+            elif event.key == K_q:
+                self.setup_wind_block()
+
         if event.type == KEYUP:
             if event.key == K_UP:
                 self.up = False
@@ -94,13 +99,14 @@ class EditorState(GameState):
             elif event.key == K_LEFT:
                 self.left = False
 
-    def add_block(self):
+    def add_block(self, x, y):
         if not self.player.current_block:
             self.message_screen.append(('Select block by pressing Esc', self.time + 2))
             return
         block = type(self.player.current_block)(self,
-                                                self.player.rect.left,
-                                                self.player.rect.top)
+                                                x,
+                                                y,
+                                                *self.player.current_block.args)
         self.entities.add(block)  # probably need to add collision
         self.platforms.append(block)
 
@@ -125,9 +131,21 @@ class EditorState(GameState):
             for i in range(18):
                 cycle((i + 1) * 32, 0)
 
+    def setup_wind_block(self):
+        if len(self.platforms) >= 2:
+            block1, block2 = self.platforms[-2:]
+            if type(block1) == WindArea and type(block2) == WindArea:
+                for i in range(2):
+                    self.entities.remove(self.platforms.pop())
+                self.player.current_block.args = [block2.rect.left, block2.rect.top]
+            self.add_block(block1.rect.left, block1.rect.top)
+
     def undo_last_action(self):
         if self.platforms:
             self.entities.remove(self.platforms.pop())
+
+    def redo_last_action(self):
+        self.player.current_block = self.platforms[-1]
 
     def complex_camera(self, camera, target_rect):
         l, t, _, _ = target_rect

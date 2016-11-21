@@ -30,7 +30,7 @@ class LevelEditor:
                 self.states[self.current_state].input(event)
 
     def save_level(self, name):
-        level_data = [[type(x), x.rect] for x in self.states[0].platforms]
+        level_data = [[type(x), x.rect, x.args] for x in self.states[0].platforms]
         with open("src/levels/{}".format(name), "wb") as f:
             pickle.dump(level_data, f)
 

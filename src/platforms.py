@@ -15,6 +15,7 @@ class Platform(pygame.sprite.Sprite):
         self.image.fill(Color("#DDDDDD"))
         self.rect = Rect(x, y, w, h)
         self.tick_period = None
+        self.args = []
 
     def next_image(self):
         while True:
@@ -128,14 +129,20 @@ class SlowDown(Platform):
 
 class WindArea(Platform):
 
-    def __init__(self, gamestate, x, y, w=32, h=32):
+    def __init__(self, gamestate, x, y, *args, w=32, h=32):
         super().__init__(gamestate, x, y)
         self.image = pygame.Surface((w, h), pygame.SRCALPHA, 32)
         self.rect = Rect(x, y, w, h)
         self.image.fill((255, 0, 0, 150))
         self.starting_point = (x, y)
-        self.x_speed = -0.85
-        self.y_speed = 0
+        self.coef = 0.5
+        if args:
+            x1, y1 = args
+        else:
+            x1, y1 = 0, 0
+        self.x_speed = (x - x1) * self.coef
+        self.y_speed = (y - y1) * self.coef
+        self.args += [x1, y1]
 
     def collision_handler(self, player):
         if self.rect.colliderect(player.rect):

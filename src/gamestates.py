@@ -98,13 +98,13 @@ class PlayGameState(GameState):
         max_w = 0
         max_h = 0
         for platform in layout:
-            p_type, rect = platform
+            p_type, rect, args = platform
             x, y, w, h = rect.left, rect.top, rect.width, rect.height
             if y > max_h:
                 max_h = y
             if x > max_w:
                 max_w = x
-            block = p_type(self, x, y, w=w, h=h)
+            block = p_type(self, x, y, *args, w=w, h=h)
             self.platforms.append(block)
             self.entities.add(block)
         self.level_width = max_w + 32
