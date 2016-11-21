@@ -158,8 +158,10 @@ class PlayerAnimated(Player):
         super().__init__(x, y, gamestate)
         self.images = []
         self.rect = Rect(x, y, 29, 12)
-        for i in range(1, 5):
-            self.images.append(pygame.image.load('src/sprites/player/INS_CHAR{}.png'.format(i)))
+        for i in range(1, 21):
+            pic = pygame.image.load('src/sprites/player2/{}.gif'.format(i))
+            pic = pygame.transform.scale(pic, (64, 64))
+            self.images.append(pic)
         self.image = self.images[0]
         self.image_generator = self.next_image()
         self.time_stamp = 0.25

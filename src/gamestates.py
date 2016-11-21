@@ -50,7 +50,7 @@ class PlayGameState(GameState):
         self.platforms = []
         self.level = level
         self.build_level(level.level)
-        self.player = player(32, 32, self)
+        self.player = player(64, 64, self)
         self.level_effects = [x(self.player) for x in level.effects]
         self.level_number = level.number
         #self.level_layout = level.layout
