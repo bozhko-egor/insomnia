@@ -8,6 +8,8 @@
 5. `i` - place cursor into nearest 32p*32p tile
 6. `t` - cursor moving in 32p increments (toggle)
 7. `r` - select last used block
+8. `F5` - quick save your work
+9. `q`
 
 
 

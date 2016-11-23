@@ -4,6 +4,7 @@ from src.gamestates import GameState, OffsetCamera
 from .dummy_player import DummyPlayer
 from src.platforms import Platform, WindArea
 from src.editor.menu import PauseScreen
+import time
 
 class EditorState(GameState):
 
@@ -93,6 +94,8 @@ class EditorState(GameState):
                 print(block_switch)
                 block = block_switch.get(chr(event.key), None)
                 self.player.current_block = block(self, self.player.rect.left, self.player.rect.top)
+            elif event.key == K_F5:
+                self.quick_save()
 
         if event.type == KEYUP:
             if event.key == K_UP:
@@ -136,6 +139,11 @@ class EditorState(GameState):
             for i in range(18):
                 cycle((i + 1) * 32, 0)
 
+    def quick_save(self):
+        name = time.strftime('%X')
+        name = ''.join(name.split(':'))
+        self.engine.save_level(name)
+
     def setup_wind_block(self):
         if len(self.platforms) >= 2:
             block1, block2 = self.platforms[-2:]
@@ -150,7 +158,8 @@ class EditorState(GameState):
             self.entities.remove(self.platforms.pop())
 
     def redo_last_action(self):
-        self.player.current_block = self.platforms[-1]
+        if self.platforms:
+            self.player.current_block = self.platforms[-1]
 
     def complex_camera(self, camera, target_rect):
         l, t, _, _ = target_rect

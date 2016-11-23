@@ -13,7 +13,7 @@ class MainEditorMenu(MenuGameState):
         GameState.__init__(self, engine)
         self.engine = engine
         self.menu_items = ('Create New Level', 'Load Level', "Quit")
-        self.menu_func = {'Create New Level': self.engine.to_editor,
+        self.menu_func = {'Create New Level': self.engine.to_new_level,
                           'Load Level': self.engine.to_level_input,
                           'Quit': self.exit}
         self.font = pygame.font.SysFont("monospace", 50)

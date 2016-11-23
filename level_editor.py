@@ -53,6 +53,19 @@ class LevelEditor:
     def to_editor(self):
         self.current_state = 0
 
+    def to_new_level(self):
+        self.states[0] = EditorState(self)
+        self.current_state = 0
+
+    def previous_menu(self, menu):
+        switch = {SaveLevel: self.to_pause,
+                  PauseScreen: self.to_editor,
+                  EnterLevel: self.to_menu}
+        back_func = switch.get(type(menu), None)
+        if back_func is None:
+            return None
+        back_func()
+
     def to_pause(self):
         self.current_state = 2
 
