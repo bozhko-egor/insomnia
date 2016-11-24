@@ -16,6 +16,5 @@ class Level:
         self.best_time = 0
         self.number = number
 
-
-level_list = ['184826']
+level_list = [line.strip() for line in open("src/levels/level_list.txt", 'r')]
 levels = [Level(name, i) for i, name in enumerate(level_list)]
