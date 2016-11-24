@@ -4,7 +4,9 @@ from src.gamestates import GameState, OffsetCamera
 from .dummy_player import DummyPlayer
 from src.platforms import Platform, WindArea
 from src.editor.menu import PauseScreen
+from .arrows import Arrow
 import time
+import copy
 
 class EditorState(GameState):
 
@@ -40,6 +42,8 @@ class EditorState(GameState):
                 self.screen.blit(self.bg, (x * 32, y * 32))
         for e in self.entities:
             self.screen.blit(e.image, self.camera.apply(e))
+            if hasattr(e, 'arrow'):
+                self.screen.blit(e.arrow.image, self.camera.apply(e.arrow))
         for i, message in enumerate(self.message_screen[:]):
             msg, time = message
             if self.time < time:
@@ -115,8 +119,18 @@ class EditorState(GameState):
                                                 x,
                                                 y,
                                                 *self.player.current_block.args)
+        block_current = self.player.current_block
+        if hasattr(block_current, 'arrow'):
+            dx = block_current.arrow.x - block_current.arrow.x1
+            dy = block_current.arrow.y - block_current.arrow.y1
+            arrow = Arrow(x, y, x - dx, y - dy)
+            arrow.redraw()
+            block.arrow = arrow
+
         self.entities.add(block)  # probably need to add collision
         self.platforms.append(block)
+
+        return block
 
     def draw_grid(self):
         self.bg, self.grid_bg = self.grid_bg, self.bg
@@ -151,7 +165,13 @@ class EditorState(GameState):
                 for i in range(2):
                     self.entities.remove(self.platforms.pop())
                 self.player.current_block.args = [block2.rect.left, block2.rect.top]
-            self.add_block(block1.rect.left, block1.rect.top)
+                x = block1.rect.left
+                y = block1.rect.top
+                x1 = block2.rect.left
+                y1 = block2.rect.top
+                block = self.add_block(x, y)
+                block.arrow = Arrow(x, y, x1, y1)
+                block.arrow.redraw()
 
     def undo_last_action(self):
         if self.platforms:
