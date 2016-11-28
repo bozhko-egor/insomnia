@@ -41,6 +41,24 @@ class GameEngine:
                            PlayerSelectScreen]
         self.states = [x(self) for x in self.state_list]
 
+    def __getattr__(self, name):
+        def _missing(*args, **kwargs):
+            switch = {'to_menu': 0,
+                      'to_pause': 2,
+                      'to_temp': 3,
+                      'new_game': 1,
+                      'to_mode_screen': 6,
+                      'to_level_list': 7,
+                      'to_options_screen': 8,
+                      'to_diff_infinite_menu': 9,
+                      'to_player_select': 10
+                      }
+            state = switch.get(name, None)
+            if state is None:
+                return
+            self.redraw_state(state)
+        return _missing
+
     def main_loop(self):
         while True:
             self.states[self.current_state].draw()
@@ -65,18 +83,6 @@ class GameEngine:
 
     def to_game(self):
         self.current_state = 1
-
-    def to_menu(self):
-        self.redraw_state(0)
-
-    def to_pause(self):
-        self.redraw_state(2)
-
-    def to_temp(self):
-        self.redraw_state(3)
-
-    def new_game(self):
-        self.redraw_state(1)
 
     def to_animated(self):
         level = self.states[1].level
@@ -122,30 +128,15 @@ class GameEngine:
             self.states[1] = InfiniteGameState(self)
         self.current_state = 1
 
-    def to_mode_screen(self):
-        self.redraw_state(6)
-
     def to_specific_lvl(self, level):
-        def level_func():
+        def level_func(*args, **kwargs):
             self.states[1] = self.state_list[1](self, level=level)
             self.current_state = 10
         return level_func
 
-    def to_level_list(self):
-        self.redraw_state(7)
-
-    def to_options_screen(self):
-        self.current_state = 8
-
-    def to_diff_infinite_menu(self):
-        self.redraw_state(9)
-
     def to_infinite_game(self):
         self.states[1] = InfiniteGameState(self)
         self.current_state = 1
-
-    def to_player_select(self):
-        self.redraw_state(10)
 
     def save_player_data(self):
         with open("src/saves/playerdata", "wb") as f:
