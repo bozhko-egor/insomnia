@@ -135,13 +135,13 @@ class WindArea(Platform):
         self.rect = Rect(x, y, w, h)
         self.image.fill((255, 0, 0, 150))
         self.starting_point = (x, y)
-        self.coef = 0.5
+        self.coef = 0.02
         if args:
             x1, y1 = args
         else:
             x1, y1 = 0, 0
-        self.x_speed = (x - x1) * self.coef
-        self.y_speed = (y - y1) * self.coef
+        self.x_speed = (x1 - x) * self.coef
+        self.y_speed = (y1 - y) * self.coef
         self.args += [x1, y1]
 
     def collision_handler(self, player):

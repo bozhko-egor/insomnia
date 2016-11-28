@@ -53,47 +53,12 @@ class PlayGameState(GameState):
         self.player = player(64, 64, self)
         self.level_effects = [x(self.player) for x in level.effects]
         self.level_number = level.number
-        #self.level_layout = level.layout
-        #self.build_level(self.level_layout)
-        #total_level_width = len(self.level_layout[0]) * 32
-        #total_level_height = len(self.level_layout) * 32
         self.camera = OffsetCamera(self.complex_camera, self.level_width, self.level_height)
         self.entities.add(self.player)
         self.text = PlayerInfoText(self.player, 500, 50, "monospace", 17)
         self.up = self.down = self.left = self.right = False
         pygame.time.set_timer(pygame.USEREVENT + 1, 250)
 
-        '''
-    def build_level(self, level):
-        Teleport._instances = []  # temp workaround
-        x = y = 0
-        for row in level:
-            for col in row:
-                platform_switch = {"P": Platform,
-                                   "A": AlarmClock,
-                                   "U": PowerUp,
-                                   "S": SlowDown,
-                                   "E": ExitBlock,
-                                   "M": MovingPlatform,
-                                   "W": WindArea,
-                                   "0": Teleport,
-                                   "1": Teleport,
-                                   "2": Teleport,
-                                   "3": Teleport,
-                                   "4": Teleport,
-                                   "5": Teleport}
-                plat_class = platform_switch.get(col, None)
-                if plat_class:
-                    if col in '012345':
-                        p = plat_class(self, x, y, col)
-                    else:
-                        p = plat_class(self, x, y)
-                    self.platforms.append(p)
-                    self.entities.add(p)
-                x += 32
-            y += 32
-            x = 0
-            '''
     def build_level(self, layout):
         max_w = 0
         max_h = 0

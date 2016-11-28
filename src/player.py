@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 from src.platforms import AlarmClock, PowerUp, SlowDown, ExitBlock, MovingPlatform, WindArea, Teleport
-from .effects import DefaultEffect, SlowEffect
+from .effects import DefaultEffect, SlowEffect, Friction
 from .items import Magnet
 
 
@@ -102,11 +102,11 @@ class Player(pygame.sprite.Sprite):
                 if xvel > 0:
                     self.rect.right = p.rect.left
                     self.xvel = 0  # remove xvel on contact
-                    self.add_without_duration(SlowEffect(self))
+                    self.add_without_duration(Friction(self))
                 if xvel < 0:
                     self.rect.left = p.rect.right
                     self.xvel = 0
-                    self.add_without_duration(SlowEffect(self))
+                    self.add_without_duration(Friction(self))
                 if yvel > 0:
                     self.rect.bottom = p.rect.top
                     self.onGround = True
@@ -157,7 +157,7 @@ class PlayerAnimated(Player):
     def __init__(self, x, y, gamestate):
         super().__init__(x, y, gamestate)
         self.images = []
-        self.rect = Rect(x, y, 29, 12)
+        self.rect = Rect(x, y, 30, 64)
         for i in range(1, 21):
             pic = pygame.image.load('src/sprites/player2/{}.gif'.format(i))
             pic = pygame.transform.scale(pic, (64, 64))

@@ -25,13 +25,19 @@ class SlowEffect(Effect):
 
     def __init__(self, player):
         super().__init__(player)
-        self.duration = 1
+        self.duration = 5
         self.time_left = 0
         self.start_time = None
         self.name = 'slowed'
 
     def set_effect(self):
         self.player.max_vel = 5
+
+class Friction(SlowEffect):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.duration = 1.5
 
 
 class InertiaEffect(Effect):
