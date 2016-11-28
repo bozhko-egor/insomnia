@@ -16,6 +16,8 @@ class Platform(pygame.sprite.Sprite):
         self.rect = Rect(x, y, w, h)
         self.tick_period = None
         self.args = []
+        self.rect2 = Rect(x-1, y, w + 2, h)
+        self.gamestate.platforms_collider.append(self.rect2)
 
     def next_image(self):
         while True:

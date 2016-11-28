@@ -45,55 +45,21 @@ class PlayGameState(GameState):
     def __init__(self, engine, player=Player, level=levels[0]):
         super().__init__(engine)
         self.bg = pygame.image.load('src/sprites/backgrounds/background.png')
-        #self.bg.convert()
         self.entities = pygame.sprite.Group()
         self.platforms = []
+        self.platforms_collider = []
         self.level = level
         self.build_level(level.level)
         self.player = player(64, 64, self)
         self.level_effects = [x(self.player) for x in level.effects]
         self.level_number = level.number
-        #self.level_layout = level.layout
-        #self.build_level(self.level_layout)
-        #total_level_width = len(self.level_layout[0]) * 32
-        #total_level_height = len(self.level_layout) * 32
         self.camera = OffsetCamera(self.complex_camera, self.level_width, self.level_height)
         self.entities.add(self.player)
         self.text = PlayerInfoText(self.player, 500, 50, "monospace", 17)
         self.up = self.down = self.left = self.right = False
-        pygame.time.set_timer(pygame.USEREVENT + 1, 250)
 
-        '''
-    def build_level(self, level):
-        Teleport._instances = []  # temp workaround
-        x = y = 0
-        for row in level:
-            for col in row:
-                platform_switch = {"P": Platform,
-                                   "A": AlarmClock,
-                                   "U": PowerUp,
-                                   "S": SlowDown,
-                                   "E": ExitBlock,
-                                   "M": MovingPlatform,
-                                   "W": WindArea,
-                                   "0": Teleport,
-                                   "1": Teleport,
-                                   "2": Teleport,
-                                   "3": Teleport,
-                                   "4": Teleport,
-                                   "5": Teleport}
-                plat_class = platform_switch.get(col, None)
-                if plat_class:
-                    if col in '012345':
-                        p = plat_class(self, x, y, col)
-                    else:
-                        p = plat_class(self, x, y)
-                    self.platforms.append(p)
-                    self.entities.add(p)
-                x += 32
-            y += 32
-            x = 0
-            '''
+        pygame.time.set_timer(pygame.USEREVENT + 1, 100)
+
     def build_level(self, layout):
         max_w = 0
         max_h = 0
@@ -125,7 +91,7 @@ class PlayGameState(GameState):
             if type(p) in [Player, PlayerAnimated]:
                 continue
             p.update()
-        self.timer.tick(45)
+        self.timer.tick(60)
         self.camera.update(self.player)
         self.text.update(self.screen)
         self.player.update(self.up, self.down, self.left, self.right, self.platforms)
@@ -133,7 +99,7 @@ class PlayGameState(GameState):
 
     def input(self, event):
         if event.type == pygame.USEREVENT + 1:
-            self.player.timer += 0.25  # used in counting seconds
+            self.player.timer += 0.1  # used in counting seconds
         if event.type == QUIT:
             self.exit()
 

@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 from src.platforms import AlarmClock, PowerUp, SlowDown, ExitBlock, MovingPlatform, WindArea, Teleport
-from .effects import DefaultEffect, SlowEffect
+from .effects import DefaultEffect, SlowEffect, Friction
 from .items import Magnet
 
 
@@ -30,7 +30,7 @@ class Player(pygame.sprite.Sprite):
     def update(self, up, down, left, right, platforms):
         if self.item:
             self.item.update()
-        self.check_status_effects()
+        self.check_status_effects(up, down, left, right, platforms)
         if not self.check_level_effects(up, down, left, right):  # using alternate mechanics
             if up:
                 if self.onGround:
@@ -38,9 +38,9 @@ class Player(pygame.sprite.Sprite):
             if down:
                 pass
             if left:
-                self.xvel -= 0.5
+                self.xvel -= 0.3
             if right:
-                self.xvel += 0.5
+                self.xvel += 0.3
             if not self.onGround:
                 self.yvel += 0.3
                 if self.yvel > self.max_vel:
@@ -49,9 +49,9 @@ class Player(pygame.sprite.Sprite):
                 if abs(self.xvel) < 0.5:
                     self.xvel = 0
                 if self.xvel > 0:
-                    self.xvel -= 0.4
+                    self.xvel -= 0.6
                 else:
-                    self.xvel += 0.4
+                    self.xvel += 0.6
 
         # increment in x direction
         self.rect.left += self.xvel
@@ -102,11 +102,9 @@ class Player(pygame.sprite.Sprite):
                 if xvel > 0:
                     self.rect.right = p.rect.left
                     self.xvel = 0  # remove xvel on contact
-                    self.add_without_duration(SlowEffect(self))
                 if xvel < 0:
                     self.rect.left = p.rect.right
                     self.xvel = 0
-                    self.add_without_duration(SlowEffect(self))
                 if yvel > 0:
                     self.rect.bottom = p.rect.top
                     self.onGround = True
@@ -114,6 +112,10 @@ class Player(pygame.sprite.Sprite):
                 if yvel < 0:
                     self.yvel = 0  # lose speed on *head* contact with platform
                     self.rect.top = p.rect.bottom
+
+        for p2 in self.gamestate.platforms_collider:  # slow area near platform blocks
+            if p2.colliderect(self.rect):
+                self.add_without_duration(Friction(self))
 
     def add_effect(self, effect):
         if not self.check_effect(effect):
@@ -134,12 +136,16 @@ class Player(pygame.sprite.Sprite):
                 return True
         return False
 
-    def check_status_effects(self):
+    def check_status_effects(self, *args):
         for i, effect in enumerate(self.status_effects[:]):
             time_left = effect.duration - (self.timer - effect.start_time)
             effect.time_left = time_left
             if time_left > 0:
                 effect.set_effect()
+                try:
+                    effect.movement_handler(*args)
+                except AttributeError:
+                    pass
                 effect.update(35, 35 + i * 15)
             else:
                 self.status_effects.remove(effect)

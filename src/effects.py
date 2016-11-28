@@ -10,7 +10,7 @@ class Effect:
         self.name = None
 
     def update(self, x, y):
-        msg = "{} {}s".format(self.name, self.time_left)
+        msg = "{} {}s".format(self.name, round(self.time_left, 2))
         label = self.font.render(msg, 1, (255, 0, 255))
         self.player.gamestate.screen.blit(label, (x, y))
 
@@ -29,10 +29,26 @@ class SlowEffect(Effect):
         self.time_left = 0
         self.start_time = None
         self.name = 'slowed'
+        self.jump_a = 2
 
     def set_effect(self):
         self.player.max_vel = 5
 
+
+class Friction(SlowEffect):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.duration = 0.2
+
+    def movement_handler(self, *args):
+        up, down, left, right, platforms = args
+        if left:
+            self.player.xvel -= self.jump_a
+            return
+        if right:
+            self.player.xvel += self.jump_a
+            return
 
 class InertiaEffect(Effect):
     """level effect"""
