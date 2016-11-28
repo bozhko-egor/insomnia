@@ -98,7 +98,7 @@ class EditorState(GameState):
                 print(block_switch)
                 block = block_switch.get(chr(event.key), None)
                 self.player.current_block = block(self, self.player.rect.left, self.player.rect.top)
-            elif event.key == K_F5:
+            elif event.key == K_s:
                 self.quick_save()
 
         if event.type == KEYUP:

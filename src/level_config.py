@@ -1,5 +1,6 @@
 import pickle
 import pygame
+from os import listdir
 from pygame.locals import *
 
 
@@ -16,6 +17,5 @@ class Level:
         self.best_time = 0
         self.number = number
 
-
-level_list = ['184826']
+level_list = listdir(path='src/levels')
 levels = [Level(name, i) for i, name in enumerate(level_list)]

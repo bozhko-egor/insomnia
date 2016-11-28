@@ -157,4 +157,6 @@ class SaveLevel(MainEditorMenu):
     def get_level_name(self):
         name = ''.join(self.text_input.stack)
         self.engine.save_level(name)
+        with open('src/levels/level_list.txt', 'a') as file:
+            file.writelines(name + '\n')
         self.err_msg.append(('Done!', self.time + 1))
