@@ -90,7 +90,6 @@ class EnterLevel(MainEditorMenu):
         self.time = 0
         pygame.time.set_timer(pygame.USEREVENT + 1, 500)
 
-
     def draw(self):
         super().draw()
         for error in self.err_msg[:]:
@@ -159,5 +158,5 @@ class SaveLevel(MainEditorMenu):
         name = ''.join(self.text_input.stack)
         self.engine.save_level(name)
         with open('src/levels/level_list.txt', 'a') as file:
-            file.writelines(name+'\n')
+            file.writelines(name + '\n')
         self.err_msg.append(('Done!', self.time + 1))
