@@ -5,6 +5,7 @@ from src.menus import PauseGameState, MenuGameState, \
     TempScreen, DeathScreenState, RoundWinScreen, ModeScreen, LevelList, \
     OptionsScreen, DifficultyInfiniteMenu, PlayerSelectScreen
 from src.level_config import levels
+from src.scenes.sc1 import TextQuest
 from src.player import PlayerAnimated
 import pickle
 import os
@@ -27,7 +28,7 @@ class GameEngine:
             if not os.path.exists('src/saves/'):
                 os.makedirs('src/saves/')
             self.reset_highscores()
-        self.current_state = 0
+        self.current_state =11
         self.state_list = [MenuGameState,
                            PlayGameState,
                            PauseGameState,
@@ -38,7 +39,8 @@ class GameEngine:
                            LevelList,
                            OptionsScreen,
                            DifficultyInfiniteMenu,
-                           PlayerSelectScreen]
+                           PlayerSelectScreen,
+                           TextQuest]
         self.states = [x(self) for x in self.state_list]
 
     def __getattr__(self, name):

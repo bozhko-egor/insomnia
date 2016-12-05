@@ -30,7 +30,8 @@ class TextInput:
                 if len(self.stack) > 6:
                     return
                 self.stack.append(chr(event.key))
-
+            if event.key == K_SPACE:
+                self.stack.append(' ')
             if event.key == K_BACKSPACE:
                 if len(self.stack) == 0:
                     return

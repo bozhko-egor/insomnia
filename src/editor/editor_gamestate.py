@@ -21,7 +21,7 @@ class EditorState(GameState):
         self.entities = pygame.sprite.Group()
         self.player = player(32, 32, self)
         self.platforms = []
-        self.camera = OffsetCamera(self.complex_camera, 640, 10**6)
+        self.camera = OffsetCamera(self.complex_camera, 10**6, 10**6)
         self.entities.add(self.player)
         self.up = self.down = self.left = self.right = False
         self.time = 0
@@ -152,6 +152,13 @@ class EditorState(GameState):
         if not y:
             for i in range(18):
                 cycle((i + 1) * 32, 0)
+
+    def gravity_generator(self):
+        while True:
+            for i in ['up', 'down', 'left', 'right']:
+                yield i
+
+    def select_acceleration(self):
 
     def quick_save(self):
         name = time.strftime('%X')
