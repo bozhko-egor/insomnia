@@ -159,6 +159,7 @@ class EditorState(GameState):
                 yield i
 
     def select_acceleration(self):
+        pass
 
     def quick_save(self):
         name = time.strftime('%X')

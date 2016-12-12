@@ -34,7 +34,7 @@ class TextQuest(MenuGameState):
     def input(self, event):
         super().input(event)
         if event.type == pygame.USEREVENT + 2:
-            self.time += 500
+            self.time += 500 
 
     def update(self):
         pygame.display.update()
