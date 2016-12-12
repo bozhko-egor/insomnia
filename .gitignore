@@ -5,3 +5,4 @@ game.py
 /src/levels/*
 /src/audio/*
 .DS_Store
+/Doc

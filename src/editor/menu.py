@@ -38,7 +38,7 @@ class PauseScreen(MainEditorMenu):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.menu_items = ('Platform', 'AlarmClock', 'PowerUp', 'ExitBlock', 'SlowDown', 'WindArea', 'Teleport')
+        self.menu_items = ('Platform', 'AlarmClock', 'PowerUp', 'ExitBlock', 'SlowDown', 'WindArea', 'Teleport', 'SpawnPoint')
         self.blocks = {x: globals()[x] for x in self.menu_items}
         self.menu_func = {x: self.engine.to_editor_with_block(self.blocks[x]) for x in self.menu_items}
         self.menu_func.update({'Save Level': self.engine.to_save_level,
