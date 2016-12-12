@@ -1,11 +1,12 @@
 import pygame
 from pygame import *
-from src.gamestates import PlayGameState, InfiniteGameState
+from src.gamestates import PlayGameState
 from src.menus import PauseGameState, MenuGameState, \
     TempScreen, DeathScreenState, RoundWinScreen, ModeScreen, LevelList, \
     OptionsScreen, DifficultyInfiniteMenu, PlayerSelectScreen
 from src.level_config import levels
-from src.player import PlayerAnimated
+from src.scenes.sc1 import TextQuest
+from src.player import PlayerAnimated, OfficePlayer
 import pickle
 import os
 
@@ -19,6 +20,7 @@ class GameEngine:
 
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
         pygame.display.set_caption("v.0.03a")
         try:
             with open("src/saves/playerdata", "rb") as f:
@@ -38,7 +40,8 @@ class GameEngine:
                            LevelList,
                            OptionsScreen,
                            DifficultyInfiniteMenu,
-                           PlayerSelectScreen]
+                           PlayerSelectScreen,
+                           TextQuest]
         self.states = [x(self) for x in self.state_list]
 
     def __getattr__(self, name):
@@ -89,6 +92,11 @@ class GameEngine:
         self.states[1] = PlayGameState(self, player=PlayerAnimated, level=level)
         self.current_state = 1
 
+    def to_office(self):
+        level = self.states[1].level
+        self.states[1] = PlayGameState(self, player=OfficePlayer, level=level)
+        self.current_state = 1
+
     def to_death_screen(self, player):
         if type(player.gamestate) == InfiniteGameState:
             lvl = player.gamestate.level_number
@@ -133,10 +141,6 @@ class GameEngine:
             self.states[1] = self.state_list[1](self, level=level)
             self.current_state = 10
         return level_func
-
-    def to_infinite_game(self):
-        self.states[1] = InfiniteGameState(self)
-        self.current_state = 1
 
     def save_player_data(self):
         with open("src/saves/playerdata", "wb") as f:

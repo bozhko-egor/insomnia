@@ -17,6 +17,7 @@ class Platform(pygame.sprite.Sprite):
         self.tick_period = None
         self.args = []
         self.rect2 = Rect(x - 1, y, w + 2, h)
+
         try:
             self.gamestate.platforms_collider.append(self.rect2)
         except AttributeError:

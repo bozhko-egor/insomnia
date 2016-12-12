@@ -183,3 +183,47 @@ class PlayerAnimated(Player):
         if self.time_stamp < self.timer:
             self.image = next(self.image_generator)
             self.time_stamp = self.timer
+
+
+class OfficePlayer(PlayerAnimated):
+
+    def update(self, up, down, left, right, platforms):
+
+        if up:
+            self.yvel = - 5
+        if down:
+            self.yvel = 5
+        if left:
+            self.xvel = -5
+        if right:
+            self.xvel = 5
+        if not(up or down):
+            self.yvel = 0
+        if not(left or right):
+            self.xvel = 0
+        # increment in x direction
+        self.rect.left += self.xvel
+        # do x-axis collisions
+        self.collide(self.xvel, 0, platforms)
+        # increment in y direction
+        self.rect.top += self.yvel
+        # assuming we're in the air
+        self.onGround = False
+        # do y-axis collisions
+        self.collide(0, self.yvel, platforms)
+
+    def collide(self, xvel, yvel, platforms):
+        for p in platforms[:]:
+            if pygame.sprite.collide_rect(self, p):
+                if xvel > 0:
+                    self.rect.right = p.rect.left
+                    self.xvel = 0  # remove xvel on contact
+                if xvel < 0:
+                    self.rect.left = p.rect.right
+                    self.xvel = 0
+                if yvel > 0:
+                    self.rect.bottom = p.rect.top
+                    self.yvel = 0
+                if yvel < 0:
+                    self.yvel = 0  # lose speed on *head* contact with platform
+                    self.rect.top = p.rect.bottom

@@ -1,7 +1,7 @@
 import pygame
 import sys
 from pygame.locals import *
-from .player import Player, PlayerAnimated
+from .player import Player, PlayerAnimated, OfficePlayer
 from .level_config import levels
 from .platforms import Platform, AlarmClock, PowerUp, SlowDown, ExitBlock, MovingPlatform, WindArea, Teleport
 from .gametext import PlayerInfoText
@@ -50,6 +50,8 @@ class PlayGameState(GameState):
         self.platforms_collider = []
         self.level = level
         self.build_level(level.level)
+        # self.background_audio = pygame.mixer.Sound(file='src/audio/1.wav')
+        # self.background_audio.play(loops=-1)
         self.player = player(*level.spawnpoint, self)
         self.level_effects = [x(self.player) for x in level.effects]
         self.level_number = level.number
@@ -88,7 +90,7 @@ class PlayGameState(GameState):
 
     def update(self):
         for p in self.entities:
-            if type(p) in [Player, PlayerAnimated]:
+            if type(p) in [Player, PlayerAnimated, OfficePlayer]:
                 continue
             p.update()
         self.timer.tick(60)
@@ -143,26 +145,3 @@ class PlayGameState(GameState):
         t = max(-(camera.height - self.height), t) # stop scrolling at the bottom
         t = min(0, t)                           # stop scrolling at the top
         return Rect(l, t, w, h)
-
-
-class InfiniteGameState(PlayGameState):
-    """Represents infinite game mode."""
-
-    def __init__(self, engine, player=Player, level=[]):
-        super().__init__(engine, player, level)
-        self.camera = OffsetCamera(self.complex_camera, 640, 10**7)
-
-    def draw(self):
-        y = self.player.rect.top
-        for i in [0, 608]:  # screen width
-            p = Platform(self, i, y + 350)
-            self.platforms.append(p)
-            self.entities.add(p)
-        if len(self.platforms) > 250:
-            for i in range(2):  # remove blocks from the queue that we have passed
-                self.entities.remove(self.platforms.pop(0))
-        for y in range(32):
-            for x in range(32):
-                self.screen.blit(self.bg, (x * 32, y * 32))
-        for e in self.entities:
-            self.screen.blit(e.image, self.camera.apply(e))
