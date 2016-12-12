@@ -78,5 +78,6 @@ class LevelEditor:
             self.current_state = 0
         return block_func
 
+
 if __name__ == '__main__':
     LevelEditor().main_loop()

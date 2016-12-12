@@ -16,8 +16,11 @@ class Platform(pygame.sprite.Sprite):
         self.rect = Rect(x, y, w, h)
         self.tick_period = None
         self.args = []
-        self.rect2 = Rect(x-1, y, w + 2, h)
-        self.gamestate.platforms_collider.append(self.rect2)
+        self.rect2 = Rect(x - 1, y, w + 2, h)
+        try:
+            self.gamestate.platforms_collider.append(self.rect2)
+        except AttributeError:
+            pass
 
     def next_image(self):
         while True:
@@ -188,3 +191,10 @@ class Teleport(Platform):
         if yvel < 0:
             player.rect.bottom = self.linked_tp.rect.top
             player.rect.left = self.linked_tp.rect.left
+
+
+class SpawnPoint(Platform):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.image.fill(Color("#DDFFFF"))

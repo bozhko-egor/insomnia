@@ -4,3 +4,4 @@ game.py
 /src/saves/*
 /src/levels/*
 .DS_Store
+/Doc

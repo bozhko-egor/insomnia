@@ -50,7 +50,7 @@ class PlayGameState(GameState):
         self.platforms_collider = []
         self.level = level
         self.build_level(level.level)
-        self.player = player(64, 64, self)
+        self.player = player(*level.spawnpoint, self)
         self.level_effects = [x(self.player) for x in level.effects]
         self.level_number = level.number
         self.camera = OffsetCamera(self.complex_camera, self.level_width, self.level_height)
