@@ -10,9 +10,9 @@ class Platform(pygame.sprite.Sprite):
         super().__init__()
         self.images = []
         self.gamestate = gamestate
-        self.image = pygame.Surface((w, h))
+        self.image = pygame.Surface((w, h), pygame.SRCALPHA, 32)
         self.image.convert()
-        self.image.fill(Color("#DDDDDD"))
+        self.image.fill((0, 0, 0, 0))
         self.rect = Rect(x, y, w, h)
         self.tick_period = None
         self.args = []
@@ -28,6 +28,9 @@ class Platform(pygame.sprite.Sprite):
             for i in self.images:
                 yield i
 
+    def change_color(self):
+        self.image.fill(Color("#DDDDDD"))
+        
     def update(self):
         pass
 

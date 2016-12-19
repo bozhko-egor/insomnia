@@ -12,7 +12,7 @@ class Effect:
     def update(self, x, y):
         msg = "{} {}s".format(self.name, round(self.time_left, 2))
         label = self.font.render(msg, 1, (255, 0, 255))
-        self.player.gamestate.screen.blit(label, (x, y))
+        self.player.gamestate.screen.blit(label, (x + 320, y))
 
 
 class DefaultEffect(Effect):

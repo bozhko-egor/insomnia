@@ -31,7 +31,7 @@ class Magnet(Item):
         if self.cd_left > self.cooldown - self.duration:
             self.on_use_effect()
         label = self.font.render('item: {}s cd'.format(self.cd_left), 1, (255, 0, 255))
-        self.gamestate.screen.blit(label, (35, 75))
+        self.gamestate.screen.blit(label, (35 + 320, 75))
 
     def on_use_effect(self):  # in dire need of refactoring
         for e in self.gamestate.entities:

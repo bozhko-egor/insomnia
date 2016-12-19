@@ -16,11 +16,9 @@ class Level:
         self.highscore = 0
         self.best_time = 0
         self.number = number
-        self.spawnpoint = next(([x[1].left, x[1].top] for x in self.level if x[0] == SpawnPoint), [64, 64])  # САМОДОКУМЕНТИРУЮЩИЙСЯ КОД
+        self.spawnpoint = next(([x[1].left, x[1].top] for x in self.level if x[0] == SpawnPoint), [420, 64])  # САМОДОКУМЕНТИРУЮЩИЙСЯ КОД
 
 
-level_list = listdir(path='src/levels')
-if '.DS_Store' in level_list:
-    level_list.remove('.DS_Store')
+level_list = [x for x in listdir(path='src/levels') if x != '.DS_Store']
 
 levels = [Level(name, i) for i, name in enumerate(level_list)]

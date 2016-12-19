@@ -5,7 +5,8 @@ from .player import Player, PlayerAnimated, OfficePlayer
 from .level_config import levels
 from .platforms import Platform, AlarmClock, PowerUp, SlowDown, ExitBlock, MovingPlatform, WindArea, Teleport
 from .gametext import PlayerInfoText
-
+from random import choice
+from os import listdir
 
 class OffsetCamera:
 
@@ -14,18 +15,18 @@ class OffsetCamera:
         self.state = Rect(0, 0, width, height)
 
     def apply(self, target):
-        return target.rect.move(self.state.topleft)
+        return target.rect.move([x + y for x, y in zip(self.state.topleft, [-320, 0])])
 
     def update(self, target):
         self.state = self.camera_func(self.state, target.rect)
 
 
 class GameState:
-    """Basic Gamestate class that every state inherits from."""
+    """Base Gamestate class that every state inherits from."""
 
     def __init__(self, engine):
         self.engine = engine
-        self.width = 640
+        self.width = 1280
         self.height = 800
         self.screen_res = (self.width, self.height)
         self.depth = 32
@@ -45,6 +46,9 @@ class PlayGameState(GameState):
     def __init__(self, engine, player=Player, level=levels[0]):
         super().__init__(engine)
         self.bg = pygame.image.load('src/sprites/backgrounds/background.png')
+        self.block_array = [pygame.image.load('src/sprites/backgrounds/blocks/{}'.format(x)) for x in listdir(path='src/sprites/backgrounds/blocks') if x != '.DS_Store']
+        self.scroller = self.scroll_infinitely()
+        self.scroller2 = self.scroll_infinitely()
         self.entities = pygame.sprite.Group()
         self.platforms = []
         self.platforms_collider = []
@@ -57,7 +61,7 @@ class PlayGameState(GameState):
         self.level_number = level.number
         self.camera = OffsetCamera(self.complex_camera, self.level_width, self.level_height)
         self.entities.add(self.player)
-        self.text = PlayerInfoText(self.player, 500, 50, "monospace", 17)
+        self.text = PlayerInfoText(self.player, 820, 50, "monospace", 17)
         self.up = self.down = self.left = self.right = False
 
         pygame.time.set_timer(pygame.USEREVENT + 1, 100)
@@ -79,14 +83,28 @@ class PlayGameState(GameState):
         self.level_height = max_h + 32
 
     def draw(self):
+        for i, item in next(self.scroller):
+            self.screen.blit(item, [0, i])
+        for i, item in next(self.scroller2):
+            self.screen.blit(item, [960, i])
         img_height = self.bg.get_height()
         diff = img_height - self.height
         diff2 = self.level_height - self.height  # background parallax
         dy = diff2 // diff
         y = self.camera.state.top // dy
-        self.screen.blit(self.bg, (0, y))
+        self.screen.blit(self.bg, (320, y))
         for e in self.entities:
             self.screen.blit(e.image, self.camera.apply(e))
+
+    def scroll_infinitely(self):
+        pos_arr = [[260*x, choice(self.block_array)] for x in range(6)]
+        while True:
+            yield pos_arr
+            for i, pos in enumerate(pos_arr[:]):
+                pos_arr[i][0] -= 5
+                if pos_arr[i][0] < - 260:
+                    pos_arr[i][0] = 1294
+                    pos_arr[i][1] = choice(self.block_array)
 
     def update(self):
         for p in self.entities:

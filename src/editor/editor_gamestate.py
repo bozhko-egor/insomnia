@@ -19,9 +19,9 @@ class EditorState(GameState):
             i.fill(Color("#666666"))
         pygame.draw.line(self.grid_bg, (0, 0, 0), (0, 0), (0, 31), 1)
         self.entities = pygame.sprite.Group()
-        self.player = player(32, 32, self)
+        self.player = player(320, 32, self)
         self.platforms = []
-        self.camera = OffsetCamera(self.complex_camera, 10**6, 10**6)
+        self.camera = OffsetCamera(self.complex_camera, self.width, 10**6)
         self.entities.add(self.player)
         self.up = self.down = self.left = self.right = False
         self.time = 0
@@ -38,7 +38,7 @@ class EditorState(GameState):
 
     def draw(self):
         for y in range(32):
-            for x in range(21):
+            for x in range(42):
                 self.screen.blit(self.bg, (x * 32, y * 32))
         for e in self.entities:
             self.screen.blit(e.image, self.camera.apply(e))
@@ -139,6 +139,7 @@ class EditorState(GameState):
         def cycle(_x, _y):
             if (_x, _y) not in [(x.rect.left, x.rect.top) for x in self.platforms if type(x) == Platform]:
                 block = Platform(self, _x, _y)
+                block.change_color()
                 self.entities.add(block)
                 self.platforms.append(block)
 
@@ -146,11 +147,11 @@ class EditorState(GameState):
         y = - (rect.top - rect.top % 32)
 
         for y_new in range(25):
-            cycle(0, y_new * 32 + y)
-            cycle(608, y_new * 32 + y)
+            cycle(320, y_new * 32 + y)
+            cycle(960, y_new * 32 + y)
 
         if not y:
-            for i in range(18):
+            for i in range(10, 29):
                 cycle((i + 1) * 32, 0)
 
     def gravity_generator(self):
